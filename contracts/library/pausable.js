@@ -1,3 +1,7 @@
+/**
+ * Reference : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Pausable.sol
+ */
+
 const Pausable = function () {
 
     const BasicOperationUtil = new BasicOperation();

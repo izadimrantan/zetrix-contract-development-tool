@@ -1,4 +1,7 @@
 const Math = function () {
+
+    const self = this;
+    
     /**
      * Represents a power function.
      *
@@ -9,7 +12,7 @@ const Math = function () {
      * @param {number|string} exp - Power of number.
      * @returns {number|string} - The power of number.
      */
-    this.pow = function (base, exp) {
+    self.pow = function (base, exp) {
         let result = 1;
         let i;
         for (i = 0; i < exp; i += 1) {
@@ -26,7 +29,7 @@ const Math = function () {
      * @throws {TypeError} Throws if the input is not a number.
      * @throws {RangeError} Throws if the input is a negative number.
      */
-    this.sqrt = function (x) {
+    self.sqrt = function (x) {
         let z = 0;
         if (Utils.int64Compare(x, 3) > 0) {
             z = x;
@@ -50,7 +53,7 @@ const Math = function () {
      * @param {number|string} y - number to compare
      * @returns {number|string} - the minimum value
      */
-    this.min = function (x, y) {
+    self.min = function (x, y) {
         return Utils.int64Compare(x, y) < 0 ? x : y;
     };
 
@@ -63,7 +66,7 @@ const Math = function () {
      * @param {number|string} y - number to compare
      * @returns {number|string} - the maximum value
      */
-    this.max = function (x, y) {
+    self.max = function (x, y) {
         return Utils.int64Compare(x, y) > 0 ? x : y;
     };
 

@@ -1,4 +1,7 @@
 const Bytes = function () {
+
+    const self = this;
+    
     /**
      * Converts a number to a binary string of specified length.
      * Pads the binary string with leading zeros if necessary.
@@ -7,7 +10,7 @@ const Bytes = function () {
      * @param {number|string} length - The desired length of the binary string.
      * @returns {string} - The binary representation of the number.
      */
-    this.num2bin = function (num, length) {
+    self.num2bin = function (num, length) {
         let binary = num.toString(2); // Convert number to binary string
         // Pad with leading zeros to match the specified length
         return binary.padStart(length, '0').toString();
@@ -20,7 +23,7 @@ const Bytes = function () {
      * @param {number|string} length - The bit length which determines how to divide the string into bytes.
      * @returns {string} - The binary string with its bytes reversed.
      */
-    this.reverseBytes = function (binaryStr, length) {
+    self.reverseBytes = function (binaryStr, length) {
         const paddingLength = Utils.int256Mod(Utils.int256Sub(8, Utils.int256Mod(length, 8)), 8);
         const paddedBinaryStr = binaryStr.padStart(Utils.int256Add(binaryStr.length, paddingLength), '0');
 

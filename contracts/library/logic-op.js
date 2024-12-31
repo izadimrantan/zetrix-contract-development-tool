@@ -4,6 +4,8 @@ const LogicOp = function () {
 
     const MathLib = new Math();
 
+    const self = this;
+
     /**
      * Represents the leftShift functionality.
      *
@@ -18,7 +20,7 @@ const LogicOp = function () {
      * @param {number|string} shiftBy - The number of positions to shift the bits to the left.
      * @returns {number|string} The result of shifting the bits of the given value to the left by the specified number of positions.
      */
-    this.leftShift = function (value, shiftBy) {
+    self.leftShift = function (value, shiftBy) {
         return Utils.int256Mul(value, MathLib.pow(2, shiftBy));
     };
 
@@ -40,7 +42,7 @@ const LogicOp = function () {
      * @param {number|string} shiftBy - The number of positions to shift the bits to the right.
      * @returns {number|string} The result of shifting the bits of the given value to the right by the specified number of positions.
      */
-    this.rightShift = function (value, shiftBy) {
+    self.rightShift = function (value, shiftBy) {
         return Utils.int256Div(value, MathLib.pow(2, shiftBy));
     };
 
@@ -57,7 +59,7 @@ const LogicOp = function () {
      * @param {number|string} b - The second operand for the bitwise AND operation. Must be an integer.
      * @returns {number|string} The result of the bitwise AND operation.
      */
-    this.bitwiseAnd = function (a, b) {
+    self.bitwiseAnd = function (a, b) {
         let result = 0;
         let multiplier = 1;
 
@@ -86,7 +88,7 @@ const LogicOp = function () {
      * @param {number|string} b - The second integer operand.
      * @returns {number|string} The result of the bitwise OR operation.
      */
-    this.bitwiseOr = function (a, b) {
+    self.bitwiseOr = function (a, b) {
         let result = 0;
         let multiplier = 1;
 

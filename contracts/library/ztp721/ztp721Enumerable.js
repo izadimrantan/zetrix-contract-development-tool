@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Reference : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+ */
+
 import 'utils/basic-operation';
 import 'interface/ztp721/IZTP721Enumerable';
 import 'library/ztp721/ztp721';
@@ -19,9 +24,10 @@ const ZTP721Enumerable = function () {
     const _supportsInterface = self.supportsInterface;
 
     // override
-    self.supportsInterface = function (interfaceId) {
+    self.supportsInterface = function (paramObj) {
+        let interfaceId = paramObj.interfaceId;
         let iface = Utils.sha256(JSON.stringify(IZTP721Enumerable), 1);
-        return interfaceId === iface || _supportsInterface.call(self, interfaceId);
+        return interfaceId === iface || _supportsInterface.call(self, paramObj);
     };
 
     const _increaseBalance = self.increaseBalance;

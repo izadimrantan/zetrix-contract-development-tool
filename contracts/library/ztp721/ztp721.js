@@ -1,4 +1,5 @@
 /**
+ * SPDX-License-Identifier: MIT
  * Reference : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol
  */
 
@@ -21,7 +22,8 @@ const ZTP721 = function () {
 
     const self = this;
 
-    self.supportsInterface = function (interfaceId) {
+    self.supportsInterface = function (paramObj) {
+        let interfaceId = paramObj.interfaceId;
         let iface1 = Utils.sha256(JSON.stringify(IZEP165), 1);
         let iface2 = Utils.sha256(JSON.stringify(IZTP721), 1);
         let iface3 = Utils.sha256(JSON.stringify(IZTP721Metadata), 1);

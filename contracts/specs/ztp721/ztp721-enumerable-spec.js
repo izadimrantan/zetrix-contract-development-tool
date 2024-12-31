@@ -77,7 +77,8 @@ function query(input_str) {
         'symbol': ZTP721Inst.symbol,
         'tokenOfOwnerByIndex': ZTP721Inst.tokenOfOwnerByIndex,
         'totalSupply': ZTP721Inst.totalSupply,
-        'tokenByIndex': ZTP721Inst.tokenByIndex
+        'tokenByIndex': ZTP721Inst.tokenByIndex,
+        'supportsInterface': ZTP721Inst.supportsInterface
     };
     let inputObj = JSON.parse(input_str);
     Utils.assert(funcList.hasOwnProperty(inputObj.method) && typeof funcList[inputObj.method] === 'function', 'Cannot find func:' + inputObj.method);
