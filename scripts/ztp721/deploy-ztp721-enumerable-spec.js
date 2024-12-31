@@ -2,8 +2,8 @@ const ZtxChainSDK = require('zetrix-sdk-nodejs');
 const co = require('co');
 const fs = require("fs");
 const BigNumber = require('bignumber.js');
-const sleep = require("../utils/delay");
-const merge = require("../utils/merge");
+const sleep = require("../../utils/delay");
+const merge = require("../../utils/merge");
 require('dotenv').config({path: ".env"})
 
 /*
@@ -15,8 +15,8 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract file name
  */
-const contractName = 'specs/ztp721-enumerable-spec.js'
-const contractAddress = process.env.SPEC_ZTP721_ENUM;
+const contractName = 'specs/ztp721/ztp721-enumerable-spec.js'
+
 /*
  Specify the Zetrix Node url
  */
@@ -61,21 +61,21 @@ co(function* () {
      */
     let input = {}
 
-    let operation = yield sdk.operation.contractUpgradeOperation({
-        contractAddress: contractAddress,
+    let contractCreateOperation = sdk.operation.contractCreateOperation({
         sourceAddress: sourceAddress,
-        sPayload: true,
-        sOwner: false,
-        payload: contractData
+        initBalance: '0',
+        payload: contractData,
+        initInput: JSON.stringify(input),
+        owner: sourceAddress,
     });
 
-    if (operation.errorCode !== 0) {
-        console.log(operation)
-        console.log("### ERROR while upgrade contract operation...")
+    if (contractCreateOperation.errorCode !== 0) {
+        console.log(contractCreateOperation)
+        console.log("### ERROR while create contract operation...")
         return;
     }
 
-    const operationItem = operation.result.operation;
+    const operationItem = contractCreateOperation.result.operation;
 
     let feeData = yield sdk.transaction.evaluateFee({
         sourceAddress,
@@ -134,6 +134,7 @@ co(function* () {
     console.log("");
     if (info != null && info.errorCode === 0) {
         console.log("Your contract has been successfully deployed.")
+        console.log("Contract address", JSON.parse(info.result.transactions[0].error_desc)[0].contract_address);
         console.log("Hash value", submitted.result.hash);
     } else {
         console.log("Your contract deployment has failed.")

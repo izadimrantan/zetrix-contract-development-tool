@@ -2,8 +2,8 @@ const ZtxChainSDK = require('zetrix-sdk-nodejs');
 const co = require('co');
 const fs = require("fs");
 const BigNumber = require('bignumber.js');
-const sleep = require("../utils/delay");
-const merge = require("../utils/merge");
+const sleep = require("../../utils/delay");
+const merge = require("../../utils/merge");
 require('dotenv').config({path: ".env"})
 
 /*
@@ -15,7 +15,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract file name
  */
-const contractName = 'specs/ztp721-spec.js'
+const contractName = 'specs/ztp721/ztp721-pausable-spec.js'
 
 /*
  Specify the Zetrix Node url

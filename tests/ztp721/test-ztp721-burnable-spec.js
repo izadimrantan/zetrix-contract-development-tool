@@ -1,9 +1,9 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
 const expect = require('chai').expect;
 const BigNumber = require('bignumber.js');
-const sleep = require("../utils/delay");
-const queryContract = require("../utils/query-contract");
-const invokeContract = require("../utils/invoke-contract");
+const sleep = require("../../utils/delay");
+const queryContract = require("../../utils/query-contract");
+const invokeContract = require("../../utils/invoke-contract");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 
@@ -16,7 +16,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract address
  */
-const contractAddress = process.env.SPEC_ZTP721;
+const contractAddress = process.env.SPEC_ZTP721_BURN;
 
 /*
  Specify the Zetrix Node url
@@ -26,7 +26,7 @@ const sdk = new ZtxChainSDK({
     secure: true
 });
 
-describe('Test contract ztp721', function () {
+describe('Test contract ztp72 burnable', function () {
     this.timeout(30000);
 
     xit('testing contract info function', async () => {
@@ -59,7 +59,7 @@ describe('Test contract ztp721', function () {
             }
         });
 
-        expect(resp.uri).to.equal("https://example.com/1");
+        expect(resp.uri).to.equal("https://example-enum.com/1");
     });
 
     xit('testing approve function', async () => {
@@ -170,7 +170,7 @@ describe('Test contract ztp721', function () {
         expect(resp).not.to.be.null;
     });
 
-    it('testing set approval for all from function', async () => {
+    xit('testing set approval for all from function', async () => {
 
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'setApprovalForAll',
@@ -183,7 +183,7 @@ describe('Test contract ztp721', function () {
         expect(resp).not.to.be.null;
     });
 
-    xit('testing burn function', async () => {
+    it('testing burn function', async () => {
 
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'burn',

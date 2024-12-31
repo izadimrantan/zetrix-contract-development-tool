@@ -1,9 +1,9 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
 const expect = require('chai').expect;
 const BigNumber = require('bignumber.js');
-const sleep = require("../utils/delay");
-const queryContract = require("../utils/query-contract");
-const invokeContract = require("../utils/invoke-contract");
+const sleep = require("../../utils/delay");
+const queryContract = require("../../utils/query-contract");
+const invokeContract = require("../../utils/invoke-contract");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 
