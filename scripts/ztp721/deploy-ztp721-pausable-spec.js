@@ -4,6 +4,8 @@ const fs = require("fs");
 const BigNumber = require('bignumber.js');
 const sleep = require("../../utils/delay");
 const merge = require("../../utils/merge");
+const {js: beautify} = require("js-beautify");
+const beautifyData = require("../../utils/beautify");
 require('dotenv').config({path: ".env"})
 
 /*
@@ -27,7 +29,7 @@ const sdk = new ZtxChainSDK({
 
 let baseDir = './contracts/';
 
-let contractData = merge(baseDir, fs.readFileSync(baseDir + contractName, 'utf8'));
+let contractData = beautifyData(merge(baseDir, fs.readFileSync(baseDir + contractName, 'utf8')));
 
 fs.writeFile('merged-contract.js', contractData, (err) => {
     // throws an error, you could also catch it here
