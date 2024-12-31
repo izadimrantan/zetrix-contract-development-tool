@@ -1,0 +1,84 @@
+'use strict';
+
+import 'interface/IZEP165';
+import 'interface/IZTP721';
+import 'interface/IZTP721Metadata';
+import 'interface/IZTP721Enumerable';
+import 'utils/interface';
+import 'library/ztp721Enumerable'
+
+const ZTP721Inst = new ZTP721Enumerable();
+const BasicOperationUtil = new BasicOperation();
+
+const TOKEN_INDEX = "token_index";
+
+// override
+ZTP721Inst.baseURI = function () {
+    return "https://example-enum.com/";
+};
+
+function mint(paramObj) {
+    let latestIdx = BasicOperationUtil.loadObj(TOKEN_INDEX);
+    if (latestIdx === false) {
+        latestIdx = "0";
+    }
+    latestIdx = Utils.int64Add(latestIdx, "1");
+    ZTP721Inst.safeMint(paramObj.to, latestIdx);
+    BasicOperationUtil.saveObj(TOKEN_INDEX, latestIdx);
+}
+
+function burn(paramObj) {
+    ZTP721Inst.burn(paramObj.tokenId);
+}
+
+function safeTransfer(paramObj) {
+    ZTP721Inst.safeTransfer(paramObj.from, paramObj.to, paramObj.tokenId);
+}
+
+function init() {
+
+    ZTP721Inst.init(
+        "MY NFT",
+        "myNFT",
+        "My NFT Token"
+    );
+
+    Utils.assert(implementsInterface(ZTP721Inst, IZTP721), "ZTP721 class does not implement IZTP721");
+    Utils.assert(implementsInterface(ZTP721Inst, IZTP721Metadata), "ZTP721 class does not implement IZTP721Metadata");
+    Utils.assert(implementsInterface(ZTP721Inst, IZEP165), "ZTP721 class does not implement IZEP165");
+    Utils.assert(implementsInterface(ZTP721Inst, IZTP721Enumerable), "ZTP721 class does not implement IZTP721Enumerable");
+    return true;
+}
+
+function main(input_str) {
+    let funcList = {
+        'safeTransferFrom': ZTP721Inst.safeTransferFrom,
+        'transferFrom': ZTP721Inst.transferFrom,
+        'approve': ZTP721Inst.approve,
+        'setApprovalForAll': ZTP721Inst.setApprovalForAll,
+        'mint': mint,
+        'burn': burn
+    };
+    let inputObj = JSON.parse(input_str);
+    Utils.assert(funcList.hasOwnProperty(inputObj.method) && typeof funcList[inputObj.method] === 'function', 'Cannot find func:' + inputObj.method);
+    funcList[inputObj.method](inputObj.params);
+}
+
+function query(input_str) {
+    let funcList = {
+        'balanceOf': ZTP721Inst.balanceOf,
+        'ownerOf': ZTP721Inst.ownerOf,
+        'getApproved': ZTP721Inst.getApproved,
+        'isApprovedForAll': ZTP721Inst.isApprovedForAll,
+        'contractInfo': ZTP721Inst.contractInfo,
+        'tokenURI': ZTP721Inst.tokenURI,
+        'name': ZTP721Inst.name,
+        'symbol': ZTP721Inst.symbol,
+        'tokenOfOwnerByIndex': ZTP721Inst.tokenOfOwnerByIndex,
+        'totalSupply': ZTP721Inst.totalSupply,
+        'tokenByIndex': ZTP721Inst.tokenByIndex
+    };
+    let inputObj = JSON.parse(input_str);
+    Utils.assert(funcList.hasOwnProperty(inputObj.method) && typeof funcList[inputObj.method] === 'function', 'Cannot find func:' + inputObj.method);
+    return JSON.stringify(funcList[inputObj.method](inputObj.params));
+}

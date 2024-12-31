@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "deploy:math": "node ./scripts/deploy-math-spec.js",
+    "deploy:bytes": "node ./scripts/deploy-bytes-spec.js",
+    "deploy:logic-op": "node ./scripts/deploy-logic-op-spec.js",
+    "deploy:ztp721": "node ./scripts/deploy-ztp721-spec.js",
+    "deploy:ztp721-enumerable": "node ./scripts/deploy-ztp721-enumerable-spec.js",
+    "test": "node ./node_modules/mocha/bin/mocha -r dotenv/config",
+    "upgrade:ztp721": "node ./scripts/upgrade-ztp721-spec.js",
+    "upgrade:ztp721-enumerable": "node ./scripts/upgrade-ztp721-enumerable-spec.js",
+    "upgrade:contractA": "node ./scripts/upgrade-contractA.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "ssl-root-cas": "^1.3.1",
+    "zetrix-sdk-nodejs": "^1.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "mocha-generators": "^2.0.0"
+  }
+}
