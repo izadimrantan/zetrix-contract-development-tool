@@ -16,7 +16,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract file name
  */
-const contractName = 'specs/ztp721/ztp721-spec.js'
+const contractName = 'specs/ztp1155/ztp1155-spec.js'
 
 /*
  Specify the Zetrix Node url
