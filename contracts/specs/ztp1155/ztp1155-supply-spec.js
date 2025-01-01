@@ -27,7 +27,12 @@ function burnBatch(paramObj) {
 
 function init() {
 
-    ZTP1155Inst.p.init('https://example.com/');
+    ZTP1155Inst.p.init(
+        'https://example.com/',
+        'MY 1155',
+        "my1155",
+        "My 1155 Token"
+    );
 
     Utils.assert(implementsInterface(ZTP1155Inst, IZTP1155), "ZTP1155 class does not implement IZTP1155");
     Utils.assert(implementsInterface(ZTP1155Inst, IZTP1155MetadataURI), "ZTP1155 class does not implement IZTP1155MetadataURI");
