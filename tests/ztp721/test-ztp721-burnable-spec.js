@@ -1,9 +1,8 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
 const expect = require('chai').expect;
-const BigNumber = require('bignumber.js');
-const sleep = require("../../utils/delay");
 const queryContract = require("../../utils/query-contract");
 const invokeContract = require("../../utils/invoke-contract");
+const deployOperation = require("../../scripts/deploy-operation");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 
@@ -16,7 +15,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract address
  */
-const contractAddress = process.env.SPEC_ZTP721_BURNABLE;
+let contractAddress = process.env.SPEC_ZTP721_BURNABLE;
 
 /*
  Specify the Zetrix Node url
@@ -27,19 +26,20 @@ const sdk = new ZtxChainSDK({
 });
 
 describe('Test contract ztp72 burnable', function () {
-    this.timeout(30000);
+    this.timeout(100000);
 
-    xit('testing contract info function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'contractInfo'
-        });
-
-        expect(resp.name).to.equal("MY NFT");
+    before(async function () {
+        let contractName = 'specs/ztp721/ztp721-burnable-spec.js'
+        let input = {};
+        contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
+        console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractAddress);
     });
 
-    it('testing mint function', async () => {
+    it('testing mint and burn function by same owner', async () => {
 
+        let tokenId = "1";
+
+        console.log('\x1b[36m%s\x1b[0m', "### Minting token " + tokenId);
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'mint',
             params: {
@@ -47,152 +47,55 @@ describe('Test contract ztp72 burnable', function () {
             }
         });
 
-        expect(resp).not.to.be.null;
-    });
+        expect(resp).to.equal(0);
 
-    xit('testing token uri function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'tokenURI',
+        console.log('\x1b[36m%s\x1b[0m', "### Burning token " + tokenId);
+        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+            method: 'burn',
             params: {
-                tokenId: "1"
+                tokenId: tokenId
             }
         });
 
-        expect(resp.uri).to.equal("https://example-enum.com/1");
+        expect(resp).to.equal(0);
     });
 
-    xit('testing approve function', async () => {
+    it('testing mint and burn function by different owner', async () => {
 
+        let recipient = "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi";
+        let tokenId = "2";
+
+        console.log('\x1b[36m%s\x1b[0m', "### Minting token " + tokenId + " to " + sourceAddress);
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'approve',
+            method: 'mint',
             params: {
-                to: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi",
-                tokenId: "1"
+                to: sourceAddress
             }
         });
 
-        expect(resp).not.to.be.null;
-    });
+        expect(resp).to.equal(0);
 
-    xit('testing get approved function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'getApproved',
-            params: {
-                tokenId: "1"
-            }
-        });
-
-        expect(resp).to.equal("ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi");
-    });
-
-    xit('testing get is approved for all function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'isApprovedForAll',
-            params: {
-                owner: sourceAddress,
-                operator: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi"
-            }
-        });
-
-        expect(resp).to.equal(false);
-    });
-
-    xit('testing get balance of function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'balanceOf',
-            params: {
-                owner: sourceAddress
-            }
-        });
-
-        expect(parseInt(resp)).to.greaterThanOrEqual(1);
-    });
-
-    xit('testing get owner of function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'ownerOf',
-            params: {
-                tokenId: "1"
-            }
-        });
-
-        expect(resp).to.equal(sourceAddress);
-    });
-
-    xit('testing get name function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'name'
-        });
-
-        expect(resp).to.equal("MY NFT");
-    });
-
-    xit('testing get symbol function', async () => {
-
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'symbol'
-        });
-
-        expect(resp).to.equal("myNFT");
-    });
-
-    xit('testing safe transfer from function', async () => {
-
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'safeTransferFrom',
-            params: {
-                from: sourceAddress,
-                to: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi",
-                tokenId: "1"
-            }
-        });
-
-        expect(resp).not.to.be.null;
-    });
-
-    xit('testing transfer from function', async () => {
-
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+        console.log('\x1b[36m%s\x1b[0m', "### Transferring token " + tokenId + " from " + sourceAddress + " to " + recipient);
+        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'transferFrom',
             params: {
                 from: sourceAddress,
-                to: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi",
-                tokenId: "1"
+                to: recipient,
+                tokenId: tokenId
             }
         });
 
-        expect(resp).not.to.be.null;
-    });
+        expect(resp).to.equal(0);
 
-    xit('testing set approval for all from function', async () => {
-
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'setApprovalForAll',
-            params: {
-                operator: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi",
-                approved: true
-            }
-        });
-
-        expect(resp).not.to.be.null;
-    });
-
-    it('testing burn function', async () => {
-
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+        console.log('\x1b[36m%s\x1b[0m', "### Burning token " + tokenId);
+        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'burn',
             params: {
-                tokenId: "2"
+                tokenId: tokenId
             }
         });
 
-        expect(resp).not.to.be.null;
+        expect(resp).to.equal(151);
     });
 
 });

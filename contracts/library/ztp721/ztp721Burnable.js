@@ -13,7 +13,7 @@ const ZTP721Burnable = function () {
 
     ZTP721.call(self);
 
-    self.burn = function (tokenId) {
+    self.p.burn = function (tokenId) {
         self.p.update(EMPTY_ADDRESS, tokenId, Chain.msg.sender);
     };
 };

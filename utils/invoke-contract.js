@@ -5,7 +5,9 @@ const sleep = require("../utils/delay");
 async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, input) {
     const nonceResult = await sdk.account.getNonce(sourceAddress);
 
-    expect(nonceResult.errorCode).to.equal(0)
+    if (nonceResult.errorCode !== 0) {
+        return nonceResult.errorCode;
+    }
 
     let nonce = nonceResult.result.nonce;
     nonce = new BigNumber(nonce).plus(1).toString(10);
@@ -17,7 +19,9 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
         input: JSON.stringify(input),
     });
 
-    expect(contractInvoke.errorCode).to.equal(0)
+    if (contractInvoke.errorCode !== 0) {
+        return contractInvoke.errorCode;
+    }
 
     const operationItem = contractInvoke.result.operation;
 
@@ -28,9 +32,9 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
         signtureNumber: '100',
     });
 
-    console.log(feeData)
-
-    expect(feeData.errorCode).to.equal(0)
+    if (feeData.errorCode !== 0) {
+        return feeData.errorCode;
+    }
 
     let feeLimit = feeData.result.feeLimit;
     let gasPrice = feeData.result.gasPrice;
@@ -43,35 +47,40 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
         operations: [operationItem],
     });
 
-    expect(blobInfo.errorCode).to.equal(0)
+    if (blobInfo.errorCode !== 0) {
+        return blobInfo.errorCode;
+    }
 
     const signed = sdk.transaction.sign({
         privateKeys: [privateKey],
         blob: blobInfo.result.transactionBlob
     })
 
-    expect(signed.errorCode).to.equal(0)
+    if (signed.errorCode !== 0) {
+        return signed.errorCode;
+    }
 
     let submitted = await sdk.transaction.submit({
         signature: signed.result.signatures,
         blob: blobInfo.result.transactionBlob
     })
 
-    expect(submitted.errorCode).to.equal(0)
+    if (submitted.errorCode !== 0) {
+        return submitted.errorCode;
+    }
 
     let info = null;
     for (let i = 0; i < 10; i++) {
         console.log("Getting the transaction history (attempt " + (i + 1).toString() + ")...")
         info = await sdk.transaction.getInfo(submitted.result.hash)
         if (info.errorCode === 0) {
+            console.log("Transaction has been successfully submitted: " + submitted.result.hash)
             break;
         }
         sleep(2000);
     }
 
-    expect(info.errorCode).to.equal(0)
-
-    return info;
+    return info.errorCode;
 }
 
 module.exports = invokeContract;

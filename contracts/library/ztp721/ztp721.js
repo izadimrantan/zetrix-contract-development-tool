@@ -165,14 +165,14 @@ const ZTP721 = function () {
             // Clear approval. No need to re-authorize or emit the Approval event
             self.p.approve(EMPTY_ADDRESS, tokenId, EMPTY_ADDRESS, false);
 
-            let balFrom = self.balanceOf(from);
+            let balFrom = self.balanceOf({owner: from});
             if (Utils.int64Compare(balFrom, '0') > 0) {
                 BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, from), Utils.int64Sub(balFrom, '1'));
             }
         }
 
         if (Utils.addressCheck(to)) {
-            let balTo = self.balanceOf(to);
+            let balTo = self.balanceOf({owner: to});
             BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, to), Utils.int64Add(balTo, '1'));
         }
 
@@ -193,7 +193,7 @@ const ZTP721 = function () {
      * remain consistent with one another.
      */
     self.p.increaseBalance = function (account, value) {
-        let balance = self.balanceOf(account);
+        let balance = self.balanceOf({owner: account});
         BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, account), Utils.int64Add(balance, value));
     };
 
