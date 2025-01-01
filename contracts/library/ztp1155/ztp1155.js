@@ -12,14 +12,16 @@ const ZTP1155 = function () {
 
     const BasicOperationUtil = new BasicOperation();
 
-    const BALANCES_PRE = 'balances'; // key: balance
-    const OPERATOR_APPROVAL_PRE = 'operator_approval'; // key: approved
-    const CONTRACT_PRE = 'contract_info';
+    const BALANCES_PRE = 'balances';
+    const OPERATOR_APPROVAL_PRE = 'operator_approval';
+    const CONTRACT_INFO = 'contract_info';
     const URI_PRE = 'uri';
     const ZTP_PROTOCOL = 'ztp1155';
     const EMPTY_ADDRESS = "0x";
 
     const self = this;
+
+    self.p = {/*protected function*/};
 
     self.supportsInterface = function (paramObj) {
         let interfaceId = paramObj.interfaceId;
@@ -29,17 +31,17 @@ const ZTP1155 = function () {
         return interfaceId === iface1 || interfaceId === iface2 || interfaceId === iface3;
     };
 
-    const _setURI = function (newuri) {
-        BasicOperationUtil.saveObj(URI_PRE, newuri);
+    self.p.setURI = function (uri) {
+        BasicOperationUtil.saveObj(URI_PRE, uri);
     };
 
     self.contractInfo = function () {
-        return BasicOperationUtil.loadObj(CONTRACT_PRE);
+        return BasicOperationUtil.loadObj(CONTRACT_INFO);
     };
 
-    self.init = function (uri) {
-        _setURI(uri);
-        BasicOperationUtil.saveObj(CONTRACT_PRE, {
+    self.p.init = function (uri) {
+        self.p.setURI(uri);
+        BasicOperationUtil.saveObj(CONTRACT_INFO, {
             protocol: ZTP_PROTOCOL
         });
     };
@@ -86,22 +88,18 @@ const ZTP1155 = function () {
      *
      * - `operator` cannot be the zero address.
      */
-    const _setApprovalForAll = function (owner, operator, approved) {
+    self.p.setApprovalForAll = function (owner, operator, approved) {
         Utils.assert(Utils.addressCheck(operator), "ERC1155: Invalid operator");
-        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, owner, operator), {approved: approved});
+        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, owner, operator), approved);
         Chain.tlog('ApprovalForAll', owner, operator, approved);
     };
 
     self.setApprovalForAll = function (paramObj) {
-        _setApprovalForAll(Chain.msg.sender, paramObj.operator, paramObj.approved);
+        self.p.setApprovalForAll(Chain.msg.sender, paramObj.operator, paramObj.approved);
     };
 
     self.isApprovedForAll = function (paramObj) {
-        let approval = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, paramObj.owner, paramObj.operator));
-        if (approval === false) {
-            return false;
-        }
-        return approval.approved;
+        return BasicOperationUtil.loadObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, paramObj.owner, paramObj.operator));
     };
 
     /**
@@ -118,7 +116,7 @@ const ZTP1155 = function () {
      *
      * NOTE: The ERC-1155 acceptance check is not performed in this function. See {_updateWithAcceptanceCheck} instead.
      */
-    self.update = function (from, to, ids, values) {
+    self.p.update = function (from, to, ids, values) {
         Utils.assert(ids.length === values.length, "ERC1155: Invalid array length");
 
         let operator = Chain.msg.sender;
@@ -157,7 +155,7 @@ const ZTP1155 = function () {
      * overriding {_update} instead.
      */
     const _updateWithAcceptanceCheck = function (from, to, ids, values, data = '') {
-        self.update(from, to, ids, values);
+        self.p.update(from, to, ids, values);
         // if (Utils.addressCheck(to)) {
         //     let operator = Chain.msg.sender;
         //     if (ids.length === 1) {
@@ -234,7 +232,7 @@ const ZTP1155 = function () {
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
      * acceptance magic value.
      */
-    self.mint = function (to, id, value, data = '') {
+    self.p.mint = function (to, id, value, data = '') {
         Utils.assert(Utils.addressCheck(to), "ERC1155: Invalid receiver");
         _updateWithAcceptanceCheck(EMPTY_ADDRESS, to, [id], [value], data);
     };
@@ -251,7 +249,7 @@ const ZTP1155 = function () {
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155BatchReceived} and return the
      * acceptance magic value.
      */
-    self.mintBatch = function (to, ids, values, data = '') {
+    self.p.mintBatch = function (to, ids, values, data = '') {
         Utils.assert(Utils.addressCheck(to), "ERC1155: Invalid receiver");
         _updateWithAcceptanceCheck(EMPTY_ADDRESS, to, ids, values, data);
     };
@@ -266,7 +264,7 @@ const ZTP1155 = function () {
      * - `from` cannot be the zero address.
      * - `from` must have at least `value` amount of tokens of type `id`.
      */
-    self.burn = function (from, id, value, data = '') {
+    self.p.burn = function (from, id, value, data = '') {
         Utils.assert(Utils.addressCheck(from), "ERC1155: Invalid sender");
         _updateWithAcceptanceCheck(from, EMPTY_ADDRESS, [id], [value], data);
     };
@@ -282,7 +280,7 @@ const ZTP1155 = function () {
      * - `from` must have at least `value` amount of tokens of type `id`.
      * - `ids` and `values` must have the same length.
      */
-    self.burnBatch = function (from, ids, values, data = '') {
+    self.p.burnBatch = function (from, ids, values, data = '') {
         Utils.assert(Utils.addressCheck(from), "ERC1155: Invalid sender");
         _updateWithAcceptanceCheck(from, EMPTY_ADDRESS, ids, values, data);
     };

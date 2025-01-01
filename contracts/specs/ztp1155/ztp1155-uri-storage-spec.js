@@ -5,16 +5,16 @@ import 'utils/interface';
 import 'interface/IZEP165';
 import 'interface/ztp1155/IZTP1155';
 import 'interface/ztp1155/IZTP1155MetadataURI';
-import 'library/ztp1155/ztp1155'
+import 'library/ztp1155/ztp1155URIStorage'
 
-const ZTP1155Inst = new ZTP1155();
+const ZTP1155Inst = new ZTP1155URIStorage();
 
 function mint(paramObj) {
     ZTP1155Inst.p.mint(paramObj.to, paramObj.id, paramObj.value);
 }
 
 function mintBatch(paramObj) {
-    ZTP1155Inst.p.mintBatch(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.mint(paramObj.to, paramObj.ids, paramObj.values);
 }
 
 function burn(paramObj) {
@@ -23,6 +23,17 @@ function burn(paramObj) {
 
 function burnBatch(paramObj) {
     ZTP1155Inst.p.burnBatch(paramObj.to, paramObj.ids, paramObj.values);
+}
+
+function setUri(paramObj) {
+    Utils.assert(paramObj.tokenId !== null && paramObj.tokenId.length > 0, 'Wrong token id');
+    Utils.assert(paramObj.tokenURI !== null && paramObj.tokenURI.length > 0, 'Wrong token url');
+    ZTP1155Inst.setUri(paramObj.tokenId, paramObj.tokenURI);
+}
+
+function setBaseURI(paramObj) {
+    Utils.assert(paramObj.baseURI !== null && paramObj.baseURI.length > 0, 'Wrong base url');
+    ZTP1155Inst.setBaseURI(paramObj.baseURI);
 }
 
 function init() {
@@ -43,7 +54,9 @@ function main(input_str) {
         'mint': mint,
         'mintBatch': mintBatch,
         'burn': burn,
-        'burnBatch': burnBatch
+        'burnBatch': burnBatch,
+        'setUri': setUri,
+        'setBaseURI': setBaseURI
     };
     let inputObj = JSON.parse(input_str);
     Utils.assert(funcList.hasOwnProperty(inputObj.method) && typeof funcList[inputObj.method] === 'function', 'Cannot find func:' + inputObj.method);

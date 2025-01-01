@@ -21,19 +21,17 @@ const ZTP721Enumerable = function () {
 
     ZTP721.call(self);
 
-    const _supportsInterface = self.supportsInterface;
-
     // override
+    const _supportsInterface = self.supportsInterface;
     self.supportsInterface = function (paramObj) {
         let interfaceId = paramObj.interfaceId;
         let iface = Utils.sha256(JSON.stringify(IZTP721Enumerable), 1);
         return interfaceId === iface || _supportsInterface.call(self, paramObj);
     };
 
-    const _increaseBalance = self.increaseBalance;
-
     // override
-    self.increaseBalance = function (account, amount) {
+    const _increaseBalance = self.p.increaseBalance;
+    self.p.increaseBalance = function (account, amount) {
         Utils.assert(Utils.int64Compare(amount, '0') === 0, 'ERC721Enumerable: Forbidden batch mint');
         _increaseBalance(self, account, amount);
     };
@@ -127,10 +125,9 @@ const ZTP721Enumerable = function () {
         BasicOperationUtil.saveObj(ALL_TOKENS, allTokens);
     };
 
-    const _update = self.update;
-
     // override
-    self.update = function (to, tokenId, auth) {
+    const _update = self.p.update;
+    self.p.update = function (to, tokenId, auth) {
         let previousOwner = _update.call(self, to, tokenId, auth);
 
         if (previousOwner === EMPTY_ADDRESS) {

@@ -5,16 +5,16 @@ import 'utils/interface';
 import 'interface/IZEP165';
 import 'interface/ztp1155/IZTP1155';
 import 'interface/ztp1155/IZTP1155MetadataURI';
-import 'library/ztp1155/ztp1155'
+import 'library/ztp1155/ztp1155Burnable'
 
-const ZTP1155Inst = new ZTP1155();
+const ZTP1155Inst = new ZTP1155Burnable();
 
 function mint(paramObj) {
     ZTP1155Inst.p.mint(paramObj.to, paramObj.id, paramObj.value);
 }
 
 function mintBatch(paramObj) {
-    ZTP1155Inst.p.mintBatch(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.mint(paramObj.to, paramObj.ids, paramObj.values);
 }
 
 function burn(paramObj) {

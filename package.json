@@ -1,19 +1,16 @@
 {
   "scripts": {
+    "help": "node help.js",
     "test": "node ./node_modules/mocha/bin/mocha -r dotenv/config",
     "deploy:math": "node ./scripts/deploy-math-spec.js",
     "deploy:bytes": "node ./scripts/deploy-bytes-spec.js",
     "deploy:logic-op": "node ./scripts/deploy-logic-op-spec.js",
-    "deploy:ztp721": "node scripts/ztp721/deploy-ztp721-spec.js",
-    "deploy:ztp721-enumerable": "node scripts/ztp721/deploy-ztp721-enumerable-spec.js",
-    "deploy:ztp721-burnable": "node scripts/ztp721/deploy-ztp721-burnable-spec.js",
-    "deploy:ztp721-pausable": "node scripts/ztp721/deploy-ztp721-pausable-spec.js",
-    "upgrade:ztp721": "node scripts/ztp721/upgrade-ztp721-spec.js",
-    "upgrade:ztp721-enumerable": "node scripts/ztp721/upgrade-ztp721-enumerable-spec.js",
-    "upgrade:ztp721-burnable": "node ./scripts/ztp721/upgrade-ztp721-burnable-spec.js",
-    "upgrade:ztp721-pausable": "node ./scripts/ztp721/upgrade-ztp721-pausable-spec.js",
-    "deploy:ztp1155": "node scripts/ztp1155/deploy-ztp1155-spec.js",
-    "upgrade:ztp1155": "node scripts/ztp1155/upgrade-ztp1155-spec.js"
+    "deploy:ztp721": "node scripts/ztp721/deploy-ztp721.js",
+    "upgrade:ztp721": "node scripts/ztp721/upgrade-ztp721.js",
+    "deploy:ztp1155": "node scripts/ztp1155/deploy-ztp1155.js",
+    "upgrade:ztp1155": "node scripts/ztp1155/upgrade-ztp1155.js",
+    "deploy:ztp20": "node scripts/ztp20/deploy-ztp20.js",
+    "upgrade:ztp20": "node scripts/ztp20/upgrade-ztp20.js"
   },
   "dependencies": {
     "dotenv": "^16.0.1",

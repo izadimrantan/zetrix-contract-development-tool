@@ -13,10 +13,9 @@ const ZTP721Pausable = function () {
     ZTP721.call(self);
     Pausable.call(self);
 
-    const _update = self.update;
-
     // override
-    self.update = function (to, tokenId, auth) {
+    const _update = self.p.update;
+    self.p.update = function (to, tokenId, auth) {
         self.whenNotPaused();
         return _update.call(self, to, tokenId, auth);
     };

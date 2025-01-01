@@ -12,15 +12,17 @@ const ZTP721 = function () {
 
     const BasicOperationUtil = new BasicOperation();
 
-    const BALANCES_PRE = 'balances'; // key: balance
-    const OWNERS_PRE = 'owner'; // key: owne
-    const TOKEN_APPROVAL_PRE = 'token_approval'; // key: address
-    const OPERATOR_APPROVAL_PRE = 'operator_approval'; // key: approved
-    const CONTRACT_PRE = 'contract_info';
+    const BALANCES_PRE = 'balances';
+    const OWNERS_PRE = 'owner';
+    const TOKEN_APPROVAL_PRE = 'token_approval';
+    const OPERATOR_APPROVAL_PRE = 'operator_approval';
+    const CONTRACT_INFO = 'contract_info';
     const ZTP_PROTOCOL = 'ztp721';
     const EMPTY_ADDRESS = "0x";
 
     const self = this;
+
+    self.p = {/*protected function*/};
 
     self.supportsInterface = function (paramObj) {
         let interfaceId = paramObj.interfaceId;
@@ -35,7 +37,7 @@ const ZTP721 = function () {
      * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
      * by default, can be overridden in child contracts.
      */
-    self.baseURI = function () {
+    self.p.baseURI = function () {
         return "";
     };
 
@@ -45,24 +47,24 @@ const ZTP721 = function () {
      * IMPORTANT: Any overrides to this function that add ownership of tokens not tracked by the
      * core ERC-721 logic MUST be matched with the use of {_increaseBalance} to keep balances
      * consistent with ownership. The invariant to preserve is that for any address `a` the value returned by
-     * `balanceOf(a)` must be equal to the number of tokens such that `_ownerOf(tokenId)` is `a`.
+     * `balanceOf(a)` must be equal to the number of tokens such that `self.p.ownerOf(tokenId)` is `a`.
      */
-    const _ownerOf = function (tokenId) {
-        let data = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(OWNERS_PRE, tokenId));
-        if (data === false) {
+    self.p.ownerOf = function (tokenId) {
+        let owner = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(OWNERS_PRE, tokenId));
+        if (owner === false) {
             return EMPTY_ADDRESS;
         }
-        return data.owner;
+        return owner;
     };
 
     /**
      * @dev Reverts if the `tokenId` doesn't have a current owner (it hasn't been minted, or it has been burned).
      * Returns the owner.
      *
-     * Overrides to ownership logic should be done to {_ownerOf}.
+     * Overrides to ownership logic should be done to {self.p.ownerOf}.
      */
     const _requiredOwned = function (tokenId) {
-        let owner = _ownerOf(tokenId);
+        let owner = self.p.ownerOf(tokenId);
         Utils.assert(Utils.addressCheck(owner), 'ERC721: Owner query for nonexistent token');
         return owner;
     };
@@ -70,20 +72,12 @@ const ZTP721 = function () {
     /**
      * @dev Returns the approved address for `tokenId`. Returns 0 if `tokenId` is not minted.
      */
-    const _getApproved = function (tokenId) {
-        let data = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOKEN_APPROVAL_PRE, tokenId));
-        if (data === false) {
+    self.p.getApproved = function (tokenId) {
+        let approvedAddress = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOKEN_APPROVAL_PRE, tokenId));
+        if (approvedAddress === false) {
             return EMPTY_ADDRESS;
         }
-        return data.address;
-    };
-
-    const _isApprovedForAll = function (owner, operator) {
-        let data = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, owner, operator));
-        if (data === false) {
-            return false;
-        }
-        return data.approved;
+        return approvedAddress;
     };
 
     /**
@@ -93,8 +87,8 @@ const ZTP721 = function () {
      * WARNING: This function assumes that `owner` is the actual owner of `tokenId` and does not verify this
      * assumption.
      */
-    const _isAuthorized = function (owner, spender, tokenId) {
-        return spender !== '' && (owner === spender || _getApproved(tokenId) === spender || _isApprovedForAll(owner, spender));
+    self.p.isAuthorized = function (owner, spender, tokenId) {
+        return spender !== '' && (owner === spender || self.p.getApproved(tokenId) === spender || self.isApprovedForAll(owner, spender));
     };
 
     /**
@@ -106,22 +100,22 @@ const ZTP721 = function () {
      * WARNING: This function assumes that `owner` is the actual owner of `tokenId` and does not verify this
      * assumption.
      */
-    const _checkAuthorized = function (owner, spender, tokenId) {
-        if (!_isAuthorized(owner, spender, tokenId)) {
+    self.p.checkAuthorized = function (owner, spender, tokenId) {
+        if (!self.p.isAuthorized(owner, spender, tokenId)) {
             Utils.assert(Utils.addressCheck(owner), "ERC721: None existent token");
             Utils.assert(false, "ERC721: Insufficient approval");
         }
     };
 
     /**
-     * @dev Variant of `_approve` with an optional flag to enable or disable the {Approval} event. The event is not
+     * @dev Variant of `self.p.approve` with an optional flag to enable or disable the {Approval} event. The event is not
      * emitted in the context of transfers.
      */
-    const _approve = function (to, tokenId, auth, emitEvent = true) {
+    self.p.approve = function (to, tokenId, auth, emitEvent = true) {
         if (emitEvent || Utils.addressCheck(auth)) {
             let owner = _requiredOwned(tokenId);
 
-            if (Utils.addressCheck(auth) && owner !== auth && !_isApprovedForAll(owner, auth)) {
+            if (Utils.addressCheck(auth) && owner !== auth && !self.isApprovedForAll(owner, auth)) {
                 Utils.assert(false, "ERC721: Invalid approver");
             }
 
@@ -129,7 +123,7 @@ const ZTP721 = function () {
                 Chain.tlog('Approval', owner, to, tokenId);
             }
         }
-        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(TOKEN_APPROVAL_PRE, tokenId), {address: to});
+        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(TOKEN_APPROVAL_PRE, tokenId), to);
     };
 
     /**
@@ -140,30 +134,12 @@ const ZTP721 = function () {
      *
      * Emits an {ApprovalForAll} event.
      */
-    const _setApprovalForAll = function (owner, operator, approved) {
+    self.p.setApprovalForAll = function (owner, operator, approved) {
         Utils.assert(Utils.addressCheck(operator), "ERC721: Invalid operator");
-        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, owner, operator), {approved: approved});
+        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, owner, operator), approved);
         Chain.tlog('ApprovalForAll', owner, operator, approved);
     };
 
-    /**
-     * @dev Unsafe write access to the balances, used by extensions that "mint" tokens using an {ownerOf} override.
-     *
-     * NOTE: the value is limited to type(uint128).max. This protect against _balance overflow. It is unrealistic that
-     * a uint256 would ever overflow from increments when these increments are bounded to uint128 values.
-     *
-     * WARNING: Increasing an account's balance using this function tends to be paired with an override of the
-     * {_ownerOf} function to resolve the ownership of the corresponding tokens so that balances and ownership
-     * remain consistent with one another.
-     */
-    self.increaseBalance = function (account, value) {
-        let bal = '0';
-        let balResp = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, account));
-        if (balResp !== false) {
-            bal = balResp.balance;
-        }
-        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, account), {balance: Utils.int64Add(bal, value)});
-    };
 
     /**
      * @dev Transfers `tokenId` from its current owner to `to`, or alternatively mints (or burns) if the current owner
@@ -176,44 +152,51 @@ const ZTP721 = function () {
      *
      * NOTE: If overriding this function in a way that tracks balances, see also {_increaseBalance}.
      */
-    self.update = function (to, tokenId, auth) {
-        let from = _ownerOf(tokenId);
+    self.p.update = function (to, tokenId, auth) {
+        let from = self.p.ownerOf(tokenId);
 
         // Perform (optional) operator check
         if (Utils.addressCheck(auth)) {
-            _checkAuthorized(from, auth, tokenId);
+            self.p.checkAuthorized(from, auth, tokenId);
         }
 
         // Execute the update
         if (Utils.addressCheck(from)) {
             // Clear approval. No need to re-authorize or emit the Approval event
-            _approve(EMPTY_ADDRESS, tokenId, EMPTY_ADDRESS, false);
+            self.p.approve(EMPTY_ADDRESS, tokenId, EMPTY_ADDRESS, false);
 
-            let balFrom = '0';
-            let balFromResp = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, from));
-            if (balFromResp !== false) {
-                balFrom = balFromResp.balance;
-            }
+            let balFrom = self.balanceOf(from);
             if (Utils.int64Compare(balFrom, '0') > 0) {
-                BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, from), {balance: Utils.int64Sub(balFrom, '1')});
+                BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, from), Utils.int64Sub(balFrom, '1'));
             }
         }
 
         if (Utils.addressCheck(to)) {
-            let balTo = '0';
-            let balToResp = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, to));
-            if (balToResp !== false) {
-                balTo = balToResp.balance;
-            }
-            BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, to), {balance: Utils.int64Add(balTo, '1')});
+            let balTo = self.balanceOf(to);
+            BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, to), Utils.int64Add(balTo, '1'));
         }
 
-        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(OWNERS_PRE, tokenId), {owner: to});
+        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(OWNERS_PRE, tokenId), to);
 
         Chain.tlog('Transfer', from, to, tokenId);
 
         return from;
     };
+    /**
+     * @dev Unsafe write access to the balances, used by extensions that "mint" tokens using an {ownerOf} override.
+     *
+     * NOTE: the value is limited to type(uint128).max. This protect against _balance overflow. It is unrealistic that
+     * a uint256 would ever overflow from increments when these increments are bounded to uint128 values.
+     *
+     * WARNING: Increasing an account's balance using this function tends to be paired with an override of the
+     * {self.p.ownerOf} function to resolve the ownership of the corresponding tokens so that balances and ownership
+     * remain consistent with one another.
+     */
+    self.p.increaseBalance = function (account, value) {
+        let balance = self.balanceOf(account);
+        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, account), Utils.int64Add(balance, value));
+    };
+
 
     /**
      * @dev Mints `tokenId` and transfers it to `to`.
@@ -229,7 +212,7 @@ const ZTP721 = function () {
      */
     const _mint = function (to, tokenId) {
         Utils.assert(Utils.addressCheck(to), "ERC721: Invalid receiver");
-        let previousOwner = self.update(to, tokenId, EMPTY_ADDRESS);
+        let previousOwner = self.p.update(to, tokenId, EMPTY_ADDRESS);
         Utils.assert(previousOwner === EMPTY_ADDRESS, "ERC721: Invalid sender");
     };
 
@@ -243,7 +226,7 @@ const ZTP721 = function () {
      *
      * Emits a {Transfer} event.
      */
-    self.safeMint = function (to, tokenId, data = "") {
+    self.p.safeMint = function (to, tokenId, data = "") {
         _mint(to, tokenId);
         /*
         if(data !== "") {
@@ -263,8 +246,8 @@ const ZTP721 = function () {
      *
      * Emits a {Transfer} event.
      */
-    self.burn = function (tokenId) {
-        let previousOwner = self.update(EMPTY_ADDRESS, tokenId, EMPTY_ADDRESS);
+    self.p.burn = function (tokenId) {
+        let previousOwner = self.p.update(EMPTY_ADDRESS, tokenId, EMPTY_ADDRESS);
         Utils.assert(Utils.addressCheck(previousOwner), "ERC721: Non existent token");
     };
 
@@ -281,7 +264,7 @@ const ZTP721 = function () {
      */
     const _transfer = function (from, to, tokenId) {
         Utils.assert(Utils.addressCheck(to), "ERC721: Transfer to the zero address");
-        let previousOwner = self.update(to, tokenId, EMPTY_ADDRESS);
+        let previousOwner = self.p.update(to, tokenId, EMPTY_ADDRESS);
         Utils.assert(Utils.addressCheck(previousOwner), "ERC721: Transfer from nonexistent owner");
         Utils.assert(previousOwner !== from, "ERC721: Transfer to the caller");
     };
@@ -305,7 +288,7 @@ const ZTP721 = function () {
      *
      * Emits a {Transfer} event.
      */
-    self.safeTransfer = function (from, to, tokenId, data = "") {
+    self.p.safeTransfer = function (from, to, tokenId, data = "") {
         _transfer(from, to, tokenId);
         /*
         if(data !== "") {
@@ -316,11 +299,11 @@ const ZTP721 = function () {
 
     self.balanceOf = function (paramObj) {
         Utils.assert(Utils.addressCheck(paramObj.owner), "ERC721: Invalid owner address: " + paramObj.owner);
-        let data = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, paramObj.owner));
-        if (data === false) {
+        let balance = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, paramObj.owner));
+        if (balance === false) {
             return '0';
         }
-        return data.balance;
+        return balance;
     };
 
     self.ownerOf = function (paramObj) {
@@ -328,7 +311,7 @@ const ZTP721 = function () {
     };
 
     self.name = function () {
-        let data = BasicOperationUtil.loadObj(CONTRACT_PRE);
+        let data = BasicOperationUtil.loadObj(CONTRACT_INFO);
         if (data === false) {
             return '';
         }
@@ -336,7 +319,7 @@ const ZTP721 = function () {
     };
 
     self.symbol = function () {
-        let data = BasicOperationUtil.loadObj(CONTRACT_PRE);
+        let data = BasicOperationUtil.loadObj(CONTRACT_INFO);
         if (data === false) {
             return '';
         }
@@ -345,32 +328,32 @@ const ZTP721 = function () {
 
     self.tokenURI = function (paramObj) {
         _requiredOwned(paramObj.tokenId);
-        let _uri = self.baseURI();
+        let _uri = self.p.baseURI();
         return {
             uri: _uri.length > 0 ? _uri + paramObj.tokenId : ""
         };
     };
 
     self.approve = function (paramObj) {
-        return _approve(paramObj.to, paramObj.tokenId, Chain.msg.sender);
+        return self.p.approve(paramObj.to, paramObj.tokenId, Chain.msg.sender);
     };
 
     self.getApproved = function (paramObj) {
         _requiredOwned(paramObj.tokenId);
-        return _getApproved(paramObj.tokenId);
+        return self.p.getApproved(paramObj.tokenId);
     };
 
     self.setApprovalForAll = function (paramObj) {
-        return _setApprovalForAll(Chain.msg.sender, paramObj.operator, paramObj.approved);
+        return self.p.setApprovalForAll(Chain.msg.sender, paramObj.operator, paramObj.approved);
     };
 
     self.isApprovedForAll = function (paramObj) {
-        return _isApprovedForAll(paramObj.owner, paramObj.operator);
+        return BasicOperationUtil.loadObj(BasicOperationUtil.getKey(OPERATOR_APPROVAL_PRE, paramObj.owner, paramObj.operator));
     };
 
     self.transferFrom = function (paramObj) {
         Utils.assert(Utils.addressCheck(paramObj.to), "ERC721: Invalid receiver address.");
-        let previousOwner = self.update(paramObj.to, paramObj.tokenId, Chain.msg.sender);
+        let previousOwner = self.p.update(paramObj.to, paramObj.tokenId, Chain.msg.sender);
         Utils.assert(previousOwner === paramObj.from, "ERC721: Incorrect owner");
     };
 
@@ -384,11 +367,11 @@ const ZTP721 = function () {
     };
 
     self.contractInfo = function () {
-        return BasicOperationUtil.loadObj(CONTRACT_PRE);
+        return BasicOperationUtil.loadObj(CONTRACT_INFO);
     };
 
-    self.init = function (name, symbol, describe = "", version = "1.0.0") {
-        BasicOperationUtil.saveObj(CONTRACT_PRE, {
+    self.p.init = function (name, symbol, describe = "", version = "1.0.0") {
+        BasicOperationUtil.saveObj(CONTRACT_INFO, {
             name: name,
             symbol: symbol,
             describe: describe,

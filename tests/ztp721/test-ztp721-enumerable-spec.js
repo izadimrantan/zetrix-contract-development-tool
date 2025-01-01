@@ -16,7 +16,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract address
  */
-const contractAddress = process.env.SPEC_ZTP721_ENUM;
+const contractAddress = process.env.SPEC_ZTP721_ENUMERABLE;
 
 /*
  Specify the Zetrix Node url
@@ -29,7 +29,7 @@ const sdk = new ZtxChainSDK({
 describe('Test contract ztp72 enumerable', function () {
     this.timeout(30000);
 
-    xit('testing contract info function', async () => {
+    it('testing contract info function', async () => {
 
         let resp = await queryContract(sdk, contractAddress, {
             method: 'contractInfo'
@@ -38,7 +38,7 @@ describe('Test contract ztp72 enumerable', function () {
         expect(resp.name).to.equal("MY NFT");
     });
 
-    xit('testing mint function', async () => {
+    it('testing mint function', async () => {
 
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'mint',
@@ -112,7 +112,7 @@ describe('Test contract ztp72 enumerable', function () {
         expect(parseInt(resp)).to.greaterThanOrEqual(1);
     });
 
-    xit('testing get owner of function', async () => {
+    it('testing get owner of function', async () => {
 
         let resp = await queryContract(sdk, contractAddress, {
             method: 'ownerOf',
@@ -200,7 +200,7 @@ describe('Test contract ztp72 enumerable', function () {
         let resp = await queryContract(sdk, contractAddress, {
             method: 'tokenOfOwnerByIndex',
             params: {
-                index: 1,
+                index: 0,
                 owner: sourceAddress
             }
         });
@@ -222,7 +222,7 @@ describe('Test contract ztp72 enumerable', function () {
         let resp = await queryContract(sdk, contractAddress, {
             method: 'tokenByIndex',
             params: {
-                index: 1
+                index: 0
             }
         });
         expect(parseInt(resp)).to.greaterThanOrEqual(1);

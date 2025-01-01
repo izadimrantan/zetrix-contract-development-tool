@@ -43,5 +43,11 @@ const Utils = {
         return "";
     },
     addressCheck(address) {
+    },
+    ecVerify(sign, pubKey, hash) {
+
+    },
+    toAddress(pubKey) {
+
     }
 }

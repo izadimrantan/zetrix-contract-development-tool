@@ -14,7 +14,7 @@ const BasicOperationUtil = new BasicOperation();
 const TOKEN_INDEX = "token_index";
 
 // override
-ZTP721Inst.baseURI = function () {
+ZTP721Inst.p.baseURI = function () {
     return "https://example-enum.com/";
 };
 
@@ -24,21 +24,21 @@ function mint(paramObj) {
         latestIdx = "0";
     }
     latestIdx = Utils.int64Add(latestIdx, "1");
-    ZTP721Inst.safeMint(paramObj.to, latestIdx);
+    ZTP721Inst.p.safeMint(paramObj.to, latestIdx);
     BasicOperationUtil.saveObj(TOKEN_INDEX, latestIdx);
 }
 
 function burn(paramObj) {
-    ZTP721Inst.burn(paramObj.tokenId);
+    ZTP721Inst.p.burn(paramObj.tokenId);
 }
 
 function safeTransfer(paramObj) {
-    ZTP721Inst.safeTransfer(paramObj.from, paramObj.to, paramObj.tokenId);
+    ZTP721Inst.p.safeTransfer(paramObj.from, paramObj.to, paramObj.tokenId);
 }
 
 function init() {
 
-    ZTP721Inst.init(
+    ZTP721Inst.p.init(
         "MY NFT",
         "myNFT",
         "My NFT Token"
