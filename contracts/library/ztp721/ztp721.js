@@ -329,9 +329,7 @@ const ZTP721 = function () {
     self.tokenURI = function (paramObj) {
         _requiredOwned(paramObj.tokenId);
         let _uri = self.p.baseURI();
-        return {
-            uri: _uri.length > 0 ? _uri + paramObj.tokenId : ""
-        };
+        return _uri.length > 0 ? _uri + paramObj.tokenId : "";
     };
 
     self.approve = function (paramObj) {
@@ -376,7 +374,8 @@ const ZTP721 = function () {
             symbol: symbol,
             describe: describe,
             protocol: ZTP_PROTOCOL,
-            version: version
+            version: version,
+            issuer: Chain.msg.sender
         });
     };
 };

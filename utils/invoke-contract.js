@@ -6,6 +6,7 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
     const nonceResult = await sdk.account.getNonce(sourceAddress);
 
     if (nonceResult.errorCode !== 0) {
+        console.log(nonceResult);
         return nonceResult.errorCode;
     }
 
@@ -20,6 +21,7 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
     });
 
     if (contractInvoke.errorCode !== 0) {
+        console.log(contractInvoke);
         return contractInvoke.errorCode;
     }
 
@@ -33,6 +35,7 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
     });
 
     if (feeData.errorCode !== 0) {
+        console.log(feeData);
         return feeData.errorCode;
     }
 
@@ -48,6 +51,7 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
     });
 
     if (blobInfo.errorCode !== 0) {
+        console.log(blobInfo);
         return blobInfo.errorCode;
     }
 
@@ -57,6 +61,7 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
     })
 
     if (signed.errorCode !== 0) {
+        console.log(signed);
         return signed.errorCode;
     }
 
@@ -66,6 +71,7 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
     })
 
     if (submitted.errorCode !== 0) {
+        console.log(submitted);
         return submitted.errorCode;
     }
 

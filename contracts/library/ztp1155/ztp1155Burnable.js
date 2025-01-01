@@ -14,14 +14,20 @@ const ZTP1155Burnable = function () {
     // override
     const _burn = self.p.burn;
     self.p.burn = function (account, id, value) {
-        Utils.assert(account === Chain.msg.sender || self.isApprovedForAll(account, Chain.msg.sender), 'Missing approval for all');
+        Utils.assert(account === Chain.msg.sender || self.isApprovedForAll({
+            owner: account,
+            operator: Chain.msg.sender
+        }), 'Missing approval for all');
         _burn.call(self, account, id, value);
     };
 
     // override
     const _burnBatch = self.p.burnBatch;
     self.p.burnBatch = function (account, ids, values) {
-        Utils.assert(account === Chain.msg.sender || self.isApprovedForAll(account, Chain.msg.sender), 'Missing approval for all');
+        Utils.assert(account === Chain.msg.sender || self.isApprovedForAll({
+            owner: account,
+            operator: Chain.msg.sender
+        }), 'Missing approval for all');
         _burnBatch.call(self, account, ids, values);
     };
 };

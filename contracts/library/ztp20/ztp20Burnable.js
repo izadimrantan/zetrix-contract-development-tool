@@ -12,14 +12,12 @@ const ZTP20Burnable = function () {
 
     ZTP20.call(self);
 
-    const _burn = self.p.burn;
-
-    self.p.burn = function (paramObj) {
-        _burn(Chain.msg.sender, paramObj.value);
+    self.burn = function (paramObj) {
+        self.p.burn(Chain.msg.sender, paramObj.value);
     };
 
     self.burnFrom = function (paramObj) {
         self.p.spendAllowance(paramObj.account, Chain.msg.sender, paramObj.value);
-        _burn(paramObj.account, paramObj.value);
+        self.p.burn(paramObj.account, paramObj.value);
     };
 };

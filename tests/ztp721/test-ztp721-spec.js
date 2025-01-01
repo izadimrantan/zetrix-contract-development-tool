@@ -15,7 +15,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract address
  */
-let contractAddress = process.env.SPEC_ZTP721;
+let contractAddress = "";
 
 /*
  Specify the Zetrix Node url
@@ -70,7 +70,7 @@ describe('Test contract ztp721', function () {
             }
         });
 
-        expect(resp.uri).to.equal("https://example.com/1");
+        expect(resp).to.equal("https://example.com/1");
     });
 
     it('testing approve function', async () => {

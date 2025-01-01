@@ -24,7 +24,6 @@ const ZTP20 = function () {
     const BALANCES_PRE = 'balances';
     const ALLOWANCES_PRE = 'allowances';
     const CONTRACT_INFO = 'contract_info';
-    const TOTAL_SUPPLY = 'total_supply';
     const ZTP_PROTOCOL = 'ztp20';
     const EMPTY_ADDRESS = "0x";
 
@@ -44,14 +43,16 @@ const ZTP20 = function () {
         return BasicOperationUtil.loadObj(CONTRACT_INFO);
     };
 
-    self.p.init = function (name, symbol, describe = "", decimals = "6", version = "1.0.0") {
+    self.p.init = function (name, symbol, describe = "", decimals = "6", supply = "0", version = "1.0.0") {
         BasicOperationUtil.saveObj(CONTRACT_INFO, {
             name: name,
             symbol: symbol,
             decimals: decimals,
             describe: describe,
             version: version,
-            protocol: ZTP_PROTOCOL
+            supply: supply,
+            protocol: ZTP_PROTOCOL,
+            issuer: Chain.msg.sender
         });
     };
 
@@ -71,32 +72,43 @@ const ZTP20 = function () {
     };
 
     self.totalSupply = function () {
-        return BasicOperationUtil.loadObj(TOTAL_SUPPLY);
+        let info = BasicOperationUtil.loadObj(CONTRACT_INFO);
+        let supply = info.supply;
+        if (supply === false) {
+            supply = "0";
+        }
+        return supply;
     };
 
     self.balanceOf = function (paramObj) {
-        return BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, paramObj.account));
+        let balance = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, paramObj.account));
+        if (balance === false) {
+            balance = "0";
+        }
+        return balance;
     };
 
     self.p.update = function (from, to, value) {
-        let totalSupply = BasicOperationUtil.loadObj(TOTAL_SUPPLY);
+        let totalSupply = self.totalSupply();
         if (from === EMPTY_ADDRESS) {
             totalSupply = Utils.int256Add(totalSupply, value);
         } else {
-            let fromBalance = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, from));
-            Utils.assert(Utils.int64Compare(fromBalance, value) < 0, 'ERC20: Insufficient balance ' + from + ', ' + fromBalance + ', ' + value);
+            let fromBalance = self.balanceOf({account: from});
+            Utils.assert(Utils.int256Compare(fromBalance, value) >= 0, 'ERC20: Insufficient balance ' + from + ', ' + fromBalance + ', ' + value);
             fromBalance = Utils.int256Sub(fromBalance, value);
             BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, from), fromBalance);
         }
         if (to === EMPTY_ADDRESS) {
             totalSupply = Utils.int256Sub(totalSupply, value);
         } else {
-            let toBalance = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(BALANCES_PRE, to));
+            let toBalance = self.balanceOf({account: to});
             toBalance = Utils.int256Add(toBalance, value);
             BasicOperationUtil.saveObj(BasicOperationUtil.getKey(BALANCES_PRE, to), toBalance);
         }
 
-        BasicOperationUtil.saveObj(TOTAL_SUPPLY, totalSupply);
+        let info = BasicOperationUtil.loadObj(CONTRACT_INFO);
+        info.supply = totalSupply;
+        BasicOperationUtil.saveObj(CONTRACT_INFO, info);
 
         Chain.tlog("Transfer", from, to, value);
     };
@@ -116,7 +128,7 @@ const ZTP20 = function () {
         Utils.assert(Utils.addressCheck(from), 'ERC20: Invalid sender ' + from);
         Utils.assert(Utils.addressCheck(to), 'ERC20: Invalid receiver ' + to);
 
-        self.update(from, to, value);
+        self.p.update(from, to, value);
     };
 
     /**
@@ -148,7 +160,7 @@ const ZTP20 = function () {
      */
     self.p.mint = function (account, value) {
         Utils.assert(Utils.addressCheck(account), 'ERC20: Invalid receiver');
-        self.update(EMPTY_ADDRESS, account, value);
+        self.p.update(EMPTY_ADDRESS, account, value);
     };
 
     /**
@@ -175,7 +187,7 @@ const ZTP20 = function () {
      */
     self.p.burn = function (account, value) {
         Utils.assert(Utils.addressCheck(account), 'ERC20: Invalid sender');
-        self.update(account, EMPTY_ADDRESS, value);
+        self.p.update(account, EMPTY_ADDRESS, value);
     };
 
     /**
@@ -190,7 +202,11 @@ const ZTP20 = function () {
      * @returns {string} allowed value.
      */
     self.allowance = function (paramObj) {
-        return BasicOperationUtil.loadObj(BasicOperationUtil.getKey(ALLOWANCES_PRE, paramObj.owner, paramObj.spender));
+        let allowance = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(ALLOWANCES_PRE, paramObj.owner, paramObj.spender));
+        if (allowance === false) {
+            allowance = "0";
+        }
+        return allowance;
     };
 
     /**
@@ -220,7 +236,7 @@ const ZTP20 = function () {
      */
     self.p.spendAllowance = function (owner, spender, value) {
         let currentAllowance = self.allowance({owner: owner, spender: spender});
-        Utils.assert(Utils.int256Compare(currentAllowance, value) > 0, 'ERC20: Insufficient allowance spender: ' + spender + ', currentAllowance: ' + currentAllowance + ', value: ' + value);
+        Utils.assert(Utils.int256Compare(currentAllowance, value) >= 0, 'ERC20: Insufficient allowance spender: ' + spender + ', currentAllowance: ' + currentAllowance + ', value: ' + value);
         self.p.approve(owner, spender, Utils.int256Sub(currentAllowance, value), false);
     };
 

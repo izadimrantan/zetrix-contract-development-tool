@@ -2,6 +2,7 @@
   "scripts": {
     "help": "node help.js",
     "test": "node ./node_modules/mocha/bin/mocha -r dotenv/config",
+    "test-coverage": "nyc --reporter=html --reporter=text node ./node_modules/mocha/bin/mocha -r dotenv/config",
     "deploy:math": "node ./scripts/deploy-math-spec.js",
     "deploy:bytes": "node ./scripts/deploy-bytes-spec.js",
     "deploy:logic-op": "node ./scripts/deploy-logic-op-spec.js",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "chai": "^4.3.6",
     "mocha": "^10.0.0",
-    "mocha-generators": "^2.0.0"
+    "mocha-generators": "^2.0.0",
+    "nyc": "^17.1.0"
   }
 }

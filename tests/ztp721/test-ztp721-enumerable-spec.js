@@ -17,7 +17,7 @@ const sourceAddress = process.env.ZTX_ADDRESS;
 /*
  Specify the smart contract address
  */
-let contractAddress = process.env.SPEC_ZTP721_ENUMERABLE;
+let contractAddress = "";
 
 /*
  Specify the Zetrix Node url

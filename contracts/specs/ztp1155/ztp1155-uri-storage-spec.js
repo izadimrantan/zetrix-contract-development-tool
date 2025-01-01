@@ -14,25 +14,25 @@ function mint(paramObj) {
 }
 
 function mintBatch(paramObj) {
-    ZTP1155Inst.p.mint(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.mintBatch(paramObj.to, paramObj.ids, paramObj.values);
 }
 
 function burn(paramObj) {
-    ZTP1155Inst.p.burn(paramObj.to, paramObj.id, paramObj.value);
+    ZTP1155Inst.p.burn(paramObj.from, paramObj.id, paramObj.value);
 }
 
 function burnBatch(paramObj) {
-    ZTP1155Inst.p.burnBatch(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.burnBatch(paramObj.from, paramObj.ids, paramObj.values);
 }
 
-function setUri(paramObj) {
-    Utils.assert(paramObj.tokenId !== null && paramObj.tokenId.length > 0, 'Wrong token id');
-    Utils.assert(paramObj.tokenURI !== null && paramObj.tokenURI.length > 0, 'Wrong token url');
-    ZTP1155Inst.setUri(paramObj.tokenId, paramObj.tokenURI);
+function setURI(paramObj) {
+    Utils.assert(paramObj.id !== undefined && paramObj.id.length > 0, 'Wrong token id');
+    Utils.assert(paramObj.tokenURI !== undefined && paramObj.tokenURI.length > 0, 'Wrong token url');
+    ZTP1155Inst.setURI(paramObj.id, paramObj.tokenURI);
 }
 
 function setBaseURI(paramObj) {
-    Utils.assert(paramObj.baseURI !== null && paramObj.baseURI.length > 0, 'Wrong base url');
+    Utils.assert(paramObj.baseURI !== undefined && paramObj.baseURI.length > 0, 'Wrong base url');
     ZTP1155Inst.setBaseURI(paramObj.baseURI);
 }
 
@@ -55,7 +55,7 @@ function main(input_str) {
         'mintBatch': mintBatch,
         'burn': burn,
         'burnBatch': burnBatch,
-        'setUri': setUri,
+        'setURI': setURI,
         'setBaseURI': setBaseURI
     };
     let inputObj = JSON.parse(input_str);
@@ -65,6 +65,7 @@ function main(input_str) {
 
 function query(input_str) {
     let funcList = {
+        'uri': ZTP1155Inst.uri,
         'balanceOf': ZTP1155Inst.balanceOf,
         'balanceOfBatch': ZTP1155Inst.balanceOfBatch,
         'isApprovedForAll': ZTP1155Inst.isApprovedForAll,

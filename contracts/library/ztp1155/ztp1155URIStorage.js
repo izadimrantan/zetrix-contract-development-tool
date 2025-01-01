@@ -19,15 +19,18 @@ const ZTP1155URIStorage = function () {
 
     // override
     const _uri = self.uri;
-    self.uri = function (tokenId) {
-        let tokenUri = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOKEN_URIS, tokenId));
+    self.uri = function (paramObj) {
+        let tokenUri = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOKEN_URIS, paramObj.id));
         let baseUri = BasicOperationUtil.loadObj(BASE_URI);
-        return (tokenUri !== false && tokenUri.length > 0) ? (baseUri + tokenUri) : _uri(tokenId);
+        if (baseUri === false) {
+            baseUri = '';
+        }
+        return (tokenUri !== false && tokenUri.length > 0) ? (baseUri + tokenUri) : _uri.call(self, paramObj);
     };
 
-    self.setUri = function (tokenId, tokenURI) {
-        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(TOKEN_URIS, tokenId), tokenURI);
-        Chain.tlog("URI", self.uri(tokenId), tokenId);
+    self.setURI = function (id, tokenURI) {
+        BasicOperationUtil.saveObj(BasicOperationUtil.getKey(TOKEN_URIS, id), tokenURI);
+        Chain.tlog("URI", self.uri({id: id}), id);
     };
 
     self.setBaseURI = function (baseURI) {

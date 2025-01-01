@@ -18,16 +18,21 @@ function mintBatch(paramObj) {
 }
 
 function burn(paramObj) {
-    ZTP1155Inst.p.burn(paramObj.to, paramObj.id, paramObj.value);
+    ZTP1155Inst.p.burn(paramObj.from, paramObj.id, paramObj.value);
 }
 
 function burnBatch(paramObj) {
-    ZTP1155Inst.p.burnBatch(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.burnBatch(paramObj.from, paramObj.ids, paramObj.values);
 }
 
 function init() {
 
-    ZTP1155Inst.p.init('https://example.com/');
+    ZTP1155Inst.p.init(
+        'https://example.com/',
+        'MY 1155',
+        "my1155",
+        "My 1155 Token"
+    );
 
     Utils.assert(implementsInterface(ZTP1155Inst, IZTP1155), "ZTP1155 class does not implement IZTP1155");
     Utils.assert(implementsInterface(ZTP1155Inst, IZTP1155MetadataURI), "ZTP1155 class does not implement IZTP1155MetadataURI");
@@ -52,6 +57,7 @@ function main(input_str) {
 
 function query(input_str) {
     let funcList = {
+        'uri': ZTP1155Inst.uri,
         'balanceOf': ZTP1155Inst.balanceOf,
         'balanceOfBatch': ZTP1155Inst.balanceOfBatch,
         'isApprovedForAll': ZTP1155Inst.isApprovedForAll,

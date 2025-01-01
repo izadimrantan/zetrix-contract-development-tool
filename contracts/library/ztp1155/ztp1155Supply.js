@@ -12,20 +12,30 @@ const ZTP1155Supply = function () {
 
     const TOTAL_SUPPLY_PRE = 'total_supply';
     const TOTAL_SUPPLY_ALL = 'total_supply_all';
+    const EMPTY_ADDRESS = "0x";
 
     const self = this;
 
     ZTP1155.call(self);
 
     self.totalSupply = function (paramObj) {
-        if (paramObj.id === null || paramObj.id.length === 0) {
-            return BasicOperationUtil.loadObj(TOTAL_SUPPLY_ALL);
+        let supply = "0";
+        if (paramObj === undefined || paramObj.id === undefined || paramObj.id.length === 0) {
+            let sAll = BasicOperationUtil.loadObj(TOTAL_SUPPLY_ALL);
+            if (sAll !== false) {
+                supply = sAll;
+            }
+        } else {
+            let sPre = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, paramObj.id));
+            if (sPre !== false) {
+                supply = sPre;
+            }
         }
-        return BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, paramObj.id));
+        return supply;
     };
 
     self.exist = function (paramObj) {
-        let supply = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, paramObj.id));
+        let supply = self.totalSupply(paramObj);
         return supply !== false;
     };
 
@@ -34,32 +44,32 @@ const ZTP1155Supply = function () {
     self.p.update = function (from, to, ids, values) {
         _update.call(self, from, to, ids, values);
 
-        if (Utils.addressCheck(from)) {
+        if (from === EMPTY_ADDRESS) {
             let totalMintValue = '0';
             let i;
             for (i = 0; i < ids.length; i += 1) {
                 let valueFrom = values[i];
-                let totalSupplyFrom = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, ids[i]));
+                let totalSupplyFrom = self.totalSupply({id: ids[i]});
                 totalSupplyFrom = Utils.int256Add(totalSupplyFrom, valueFrom);
                 BasicOperationUtil.saveObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, ids[i]), totalSupplyFrom);
                 totalMintValue = Utils.int256Add(totalMintValue, valueFrom);
             }
-            let totalSupplyAllFrom = BasicOperationUtil.loadObj(TOTAL_SUPPLY_ALL);
+            let totalSupplyAllFrom = self.totalSupply();
             totalSupplyAllFrom = Utils.int256Add(totalSupplyAllFrom, totalMintValue);
             BasicOperationUtil.saveObj(TOTAL_SUPPLY_ALL, totalSupplyAllFrom);
         }
 
-        if (Utils.addressCheck(to)) {
+        if (to === EMPTY_ADDRESS) {
             let totalBurnValue = '0';
             let j;
             for (j = 0; j < ids.length; j += 1) {
                 let valueTo = values[j];
-                let totalSupplyTo = BasicOperationUtil.loadObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, ids[j]));
+                let totalSupplyTo = self.totalSupply({id: ids[j]});
                 totalSupplyTo = Utils.int256Sub(totalSupplyTo, valueTo);
                 BasicOperationUtil.saveObj(BasicOperationUtil.getKey(TOTAL_SUPPLY_PRE, ids[j]), totalSupplyTo);
                 totalBurnValue = Utils.int256Add(totalBurnValue, valueTo);
             }
-            let totalSupplyAllTo = BasicOperationUtil.loadObj(TOTAL_SUPPLY_ALL);
+            let totalSupplyAllTo = self.totalSupply();
             totalSupplyAllTo = Utils.int256Sub(totalSupplyAllTo, totalBurnValue);
             BasicOperationUtil.saveObj(TOTAL_SUPPLY_ALL, totalSupplyAllTo);
         }

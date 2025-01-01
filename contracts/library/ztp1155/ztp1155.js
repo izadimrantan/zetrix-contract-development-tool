@@ -39,10 +39,15 @@ const ZTP1155 = function () {
         return BasicOperationUtil.loadObj(CONTRACT_INFO);
     };
 
-    self.p.init = function (uri) {
+    self.p.init = function (uri, name, symbol, describe = "", version = '1.0.0') {
         self.p.setURI(uri);
         BasicOperationUtil.saveObj(CONTRACT_INFO, {
-            protocol: ZTP_PROTOCOL
+            name: name,
+            symbol: symbol,
+            describe: describe,
+            protocol: ZTP_PROTOCOL,
+            version: version,
+            issuer: Chain.msg.sender
         });
     };
 
@@ -56,8 +61,9 @@ const ZTP1155 = function () {
      * Clients calling this function must replace the `\{id\}` substring with the
      * actual token type ID.
      */
-    self.uri = function (id) {
-        return BasicOperationUtil.loadObj(BasicOperationUtil.getKey(URI_PRE, id));
+    self.uri = function (paramObj) {
+        let _uri = BasicOperationUtil.loadObj(URI_PRE);
+        return _uri.length > 0 ? _uri + paramObj.id : "";
     };
 
     self.balanceOf = function (paramObj) {
@@ -141,7 +147,7 @@ const ZTP1155 = function () {
             let _val = values[0];
             Chain.tlog('TransferSingle', operator, from, to, _id, _val);
         } else {
-            Chain.tlog('TransferBatch', operator, from, to, ids, values);
+            Chain.tlog('TransferBatch', operator, from, to, ids.toString(), values.toString());
         }
     };
 
@@ -209,7 +215,7 @@ const ZTP1155 = function () {
             account: paramObj.from,
             operator: sender
         }), "ERC1155: Missing approval for all");
-        _safeTransferFrom(paramObj.from, paramObj.to, paramObj.id, paramObj.amount, paramObj.data);
+        _safeTransferFrom(paramObj.from, paramObj.to, paramObj.id, paramObj.value, paramObj.data);
     };
 
     self.safeBatchTransferFrom = function (paramObj) {

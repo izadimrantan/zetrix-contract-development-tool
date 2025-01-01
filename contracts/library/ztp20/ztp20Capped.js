@@ -12,6 +12,7 @@ const ZTP20Capped = function () {
     const BasicOperationUtil = new BasicOperation();
 
     const CAP_VALUE = "cap";
+    const EMPTY_ADDRESS = "0x";
 
     const self = this;
 
@@ -20,7 +21,7 @@ const ZTP20Capped = function () {
     const _init = self.p.init;
     self.p.init = function (name, symbol, describe, cap) {
         _init(name, symbol, describe);
-        Utils.assert(Utils.int256Compare(cap, 0) > 0, 'Invalid cap');
+        Utils.assert(Utils.int256Compare(cap, '0') > 0, 'Invalid cap');
         BasicOperationUtil.saveObj(CAP_VALUE, cap);
     };
 
@@ -32,10 +33,10 @@ const ZTP20Capped = function () {
     self.p.update = function (from, to, value) {
         _update(from, to, value);
 
-        if (Utils.addressCheck(from)) {
+        if (from === EMPTY_ADDRESS) {
             let maxSupply = self.cap();
             let supply = self.totalSupply();
-            Utils.assert(Utils.int256Compare(supply, maxSupply) <= 0, 'Exceeded cap value');
+            Utils.assert(Utils.int256Compare(supply, maxSupply) <= 0, 'Exceeded cap value supply: ' + supply + ' cap: ' + maxSupply);
         }
     };
 };

@@ -25,77 +25,70 @@ const sdk = new ZtxChainSDK({
     secure: true
 });
 
-describe('Test contract ztp72 burnable', function () {
+describe('Test contract ztp20 pausable', function () {
     this.timeout(100000);
 
     before(async function () {
-        let contractName = 'specs/ztp721/ztp721-burnable-spec.js'
+        let contractName = 'specs/ztp20/ztp20-pausable-spec.js'
         let input = {};
         contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
         console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractAddress);
     });
 
-    it('testing mint and burn function by same owner', async () => {
+    it('testing mint function', async () => {
 
-        let tokenId = "1";
-
-        console.log('\x1b[36m%s\x1b[0m', "### Minting token " + tokenId);
+        console.log('\x1b[36m%s\x1b[0m', "### Minting token");
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'mint',
             params: {
-                to: sourceAddress
-            }
-        });
-
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Burning token " + tokenId);
-        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'burn',
-            params: {
-                tokenId: tokenId
+                account: sourceAddress,
+                value: "1000000000000"
             }
         });
 
         expect(resp).to.equal(0);
     });
 
-    it('testing mint and burn function by different owner', async () => {
+    it('testing pause function', async () => {
 
-        let recipient = "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi";
-        let tokenId = "2";
-
-        console.log('\x1b[36m%s\x1b[0m', "### Minting token " + tokenId + " to " + sourceAddress);
+        console.log('\x1b[36m%s\x1b[0m', "### Pausing contract");
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+            method: 'pause'
+        });
+
+        expect(resp).to.equal(0);
+
+        console.log('\x1b[36m%s\x1b[0m', "### Trying to mint token after pausing");
+        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'mint',
             params: {
-                to: sourceAddress
-            }
-        });
-
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Transferring token " + tokenId + " from " + sourceAddress + " to " + recipient);
-        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'transferFrom',
-            params: {
-                from: sourceAddress,
-                to: recipient,
-                tokenId: tokenId
-            }
-        });
-
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Burning token " + tokenId);
-        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'burn',
-            params: {
-                tokenId: tokenId
+                account: sourceAddress,
+                value: "1000000000000"
             }
         });
 
         expect(resp).to.equal(151);
+    });
+
+    it('testing unpause function', async () => {
+
+        console.log('\x1b[36m%s\x1b[0m', "### Unpausing contract");
+        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+            method: 'unpause'
+        });
+
+        expect(resp).to.equal(0);
+
+        console.log('\x1b[36m%s\x1b[0m', "### Trying to mint token after unpausing");
+        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+            method: 'mint',
+            params: {
+                account: sourceAddress,
+                value: "1000000000000"
+            }
+        });
+
+        expect(resp).to.equal(0);
     });
 
 });

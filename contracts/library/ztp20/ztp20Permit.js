@@ -41,10 +41,11 @@ const ZTP20Permit = function () {
     self.permit = function (paramObj) {
         //paramObj : owner, spender, value, deadline, p, s
         Utils.assert(Utils.int64Compare(paramObj.deadline, Chain.block.timestamp) >= 0, 'ZTP20Permit: Expired signature');
-        let hash = Utils.sha256(PERMIT_TYPEHASH + paramObj.owner + paramObj.spender + paramObj.value + NoncesLib.useNonce(paramObj.owner) + paramObj.deadline);
+        let nonce = NoncesLib.useNonce(paramObj.owner);
+        let hash = Utils.sha256(PERMIT_TYPEHASH + paramObj.owner + paramObj.spender + paramObj.value + nonce.toString() + paramObj.deadline, 1);
         let validateSign = Utils.ecVerify(paramObj.s, paramObj.p, hash);
         let validatePubKey = Utils.toAddress(paramObj.p) === paramObj.owner;
-        Utils.assert(validateSign && validatePubKey, 'ZTP20Permit: Invalid signer');
+        Utils.assert(validateSign && validatePubKey, 'ZTP20Permit: Invalid signer validateSign: ' + validateSign + ', validatePubKey: ' + validatePubKey + ', nonce: ' + nonce.toString() + ', hash: ' + hash);
 
         self.p.approve(paramObj.owner, paramObj.spender, paramObj.value);
     };

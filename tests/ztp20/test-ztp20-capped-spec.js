@@ -25,67 +25,62 @@ const sdk = new ZtxChainSDK({
     secure: true
 });
 
-describe('Test contract ztp72 pausable', function () {
+describe('Test contract ztp20 capped', function () {
     this.timeout(100000);
 
     before(async function () {
-        let contractName = 'specs/ztp721/ztp721-pausable-spec.js'
+        let contractName = 'specs/ztp20/ztp20-capped-spec.js'
         let input = {};
         contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
         console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractAddress);
     });
 
-    it('testing mint function', async () => {
+    it('testing mint lesser than cap', async () => {
 
         console.log('\x1b[36m%s\x1b[0m', "### Minting token");
         let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'mint',
             params: {
-                to: sourceAddress
+                account: sourceAddress,
+                value: "1000000000000"
             }
         });
 
         expect(resp).to.equal(0);
-    });
 
-    it('testing pause function', async () => {
-
-        console.log('\x1b[36m%s\x1b[0m', "### Pausing contract");
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'pause'
+        console.log('\x1b[36m%s\x1b[0m', "### Getting balance of " + sourceAddress);
+        resp = await queryContract(sdk, contractAddress, {
+            method: 'balanceOf',
+            params: {
+                account: sourceAddress
+            }
         });
 
-        expect(resp).to.equal(0);
+        expect(resp).to.equal("1000000000000");
+    });
 
-        console.log('\x1b[36m%s\x1b[0m', "### Trying to mint token after pausing");
-        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
+    it('testing mint more than cap', async () => {
+
+        console.log('\x1b[36m%s\x1b[0m', "### Minting token");
+        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
             method: 'mint',
             params: {
-                to: sourceAddress
+                account: sourceAddress,
+                value: "1010000000000000"
             }
         });
 
         expect(resp).to.equal(151);
-    });
 
-    it('testing unpause function', async () => {
-
-        console.log('\x1b[36m%s\x1b[0m', "### Unpausing contract");
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'unpause'
-        });
-
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Trying to mint token after unpausing");
-        resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'mint',
+        console.log('\x1b[36m%s\x1b[0m', "### Getting balance of " + sourceAddress);
+        resp = await queryContract(sdk, contractAddress, {
+            method: 'balanceOf',
             params: {
-                to: sourceAddress
+                account: sourceAddress
             }
         });
 
-        expect(resp).to.equal(0);
+        expect(resp).to.equal("1000000000000");
     });
 
 });

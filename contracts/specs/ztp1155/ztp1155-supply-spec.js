@@ -14,15 +14,15 @@ function mint(paramObj) {
 }
 
 function mintBatch(paramObj) {
-    ZTP1155Inst.p.mint(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.mintBatch(paramObj.to, paramObj.ids, paramObj.values);
 }
 
 function burn(paramObj) {
-    ZTP1155Inst.p.burn(paramObj.to, paramObj.id, paramObj.value);
+    ZTP1155Inst.p.burn(paramObj.from, paramObj.id, paramObj.value);
 }
 
 function burnBatch(paramObj) {
-    ZTP1155Inst.p.burnBatch(paramObj.to, paramObj.ids, paramObj.values);
+    ZTP1155Inst.p.burnBatch(paramObj.from, paramObj.ids, paramObj.values);
 }
 
 function init() {
@@ -52,6 +52,7 @@ function main(input_str) {
 
 function query(input_str) {
     let funcList = {
+        'uri': ZTP1155Inst.uri,
         'balanceOf': ZTP1155Inst.balanceOf,
         'balanceOfBatch': ZTP1155Inst.balanceOfBatch,
         'exist': ZTP1155Inst.exist,
