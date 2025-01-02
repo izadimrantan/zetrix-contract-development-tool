@@ -9,31 +9,6 @@ Create dotenv file and fill in the zetrix address, private key and node url info
 PRIVATE_KEY=<PRIVATE_KEY>
 ZTX_ADDRESS=<ZETRIX_ADDRESS>
 NODE_URL=test-node.zetrix.com
-
-// Common
-SPEC_LOGIC_OP=ZTX3XoRz1AP8GLcPtfB2VCVDMB6Bv3LXJvS76
-SPEC_MATH=ZTX3ZJVFuJG8FiH8Gz9fo8ZYL4fFo3CZTt8Uf
-SPEC_BYTES=ZTX3P9eSyETTxGToVyEhsF6WFTaPLGTCtiH5U
-
-// ZTP721
-SPEC_ZTP721=ZTX3ce2vPWFYD3DT9ZHSPedUwqRLV4cZiRtzt
-SPEC_ZTP721_ENUMERABLE=ZTX3QKh1kJWse1LA6caB6vg7VJe7vZkx5Di2G
-SPEC_ZTP721_BURNABLE=ZTX3GJfJsWJMbpP56QVnEDVesAy7oHApChQAn
-SPEC_ZTP721_PAUSABLE=ZTX3aPyXzTkMWkLadfqrNLGCDVk4WT4gsiBdd
-
-// ZTP1155
-SPEC_ZTP1155=ZTX3SQtXaoe251gRbxJGDqTHD5wBtLN5dFWdc
-SPEC_ZTP1155_BURNABLE=ZTX3VRRFbRDga4ETf2dS7pJyDQkTUn8crACgJ
-SPEC_ZTP1155_PAUSABLE=ZTX3LSsggLA87zfN5f5DPbM93fEpTWKouahZx
-SPEC_ZTP1155_SUPPLY=ZTX3UbyUfPFcn7bTjPYnXeVHYSe8Xdnx7yAvL
-SPEC_ZTP1155_URI=ZTX3ZP3it7ZyZekPBqhXLx4anAYJTrE13SEJ2
-
-// ZTP20
-SPEC_ZTP20=ZTX3au1XQ42bu19ESx61qC6CwQSr4hfEPqCKF
-SPEC_ZTP20_PERMIT=ZTX3JBwdLZ2Sx14vbwtfQxnkaApkzNgHyc5Ae
-SPEC_ZTP20_PAUSABLE=ZTX3X4e3TBhrUY8Ca7xdZP9a2UiyUuYHbn2GP
-SPEC_ZTP20_BURNABLE=ZTX3Jf5gdqu74Y7p15m7pUa5L3sCwFAvbubWz
-SPEC_ZTP20_CAPPED=ZTX3PG81Rme1E3pMxGSpHdjYfamggR646ixaN
 ```
 
 ### Install dependencies
@@ -68,3 +43,164 @@ npm run upgrade:<NAMING_REFER_TO_PACKAGE_JSON>
 npm test tests/<TEST_CASE>.js
 ```
 
+### Development guides
+
+The development of Zetrix smart contract is using Javascript ES5 which has less support on the OOP such as `class`. Hence, we are imitating the OOP implementation by using functionalities available in the ES5.
+
+
+#### Class
+
+OOP implementation
+```java
+class Example {
+    
+    Example(String param) {
+        // constructor
+    }
+}
+
+Example exampleInst = new Example(param);
+```
+
+ES5 Javascript implementation
+```javascript
+const Example = function () {
+    
+    const self = this; // keep the context
+    
+    self.init = function (param) {
+        // constructor
+    };
+};
+
+const exampleInst = new Example();
+exampleInst.init(param);
+```
+
+#### Managing private, protected and public method
+
+OOP implementation
+```java
+class Example {
+    
+    private void privateMethod() {
+        // private method
+    }
+    
+    public void publicMethod() {
+        // public method
+    }
+
+    protected void protectedMethod() {
+        // protected method
+    }
+}
+```
+
+ES5 Javascript implementation
+```javascript
+const Example = function () {
+    
+    const self = this; // keep the context
+
+    self.p = {/*protected function*/};
+    
+    const _privateMethod = function () {
+        // private method
+    };
+    
+    self.publicMethod = function () {
+        // public method
+    };
+    
+    self.p.protectedMethod = function () {
+        // protected method : this method is similar to the public method, but we just defined in `p` nameclass to differentiate  
+    };
+};
+```
+
+#### Inheritance and override
+
+OOP implementation
+```java
+class ExampleParent {
+    
+    public void parentMethod1() {
+        
+    }
+
+    public void parentMethod2() {
+
+    }
+    
+    public void parentMethod3(int a, int b) {
+        
+    }
+}
+
+class ExampleChild extends ExampleParent {
+    
+    @Override
+    public void parentMethod1() {
+        // Override parent method
+        // Do something else and continue with original parentMethod
+        super.parentMethod1();
+    }
+
+    @Override
+    public void parentMethod2() {
+        // Override parent method
+    }
+    
+    private void childMethod(int a, int b) {
+        // Use parent function in child wrapper
+        return super.parentMethod3(a, b);
+    } 
+}
+```
+
+ES5 Javascript implementation
+```javascript
+const ExampleParent = function () {
+
+    const self = this; // keep the context
+
+    self.p = {/*protected function*/};
+    
+    self.p.parentMethod1 = function () {
+
+    };
+    
+    self.p.parentMethod2 = function() {
+        
+    };
+    
+    self.parentMethod3 = function(a, b) {
+        
+    };
+};
+
+const ExampleChild = function () {
+
+    const self = this;
+
+    ExampleParent.call(self); // Inherit
+
+    const _protectedMethod1 = self.p.protectedMethod1
+    self.p.parentMethod1 = function () {
+        // Override parent method
+        // Do something else and continue with original parentMethod
+        _protectedMethod1.call(self);
+    };
+    
+    self.p.parentMethod2 = function() {
+        // Override parent method
+    };
+
+    const _childMethod = function() {
+        // Use parent function in child wrapper
+        return self.parentMethod3(a, b);
+    };
+
+};
+```
