@@ -186,11 +186,11 @@ const ExampleChild = function () {
 
     ExampleParent.call(self); // Inherit
 
-    const _protectedMethod1 = self.p.protectedMethod1
+    const _parentMethod1 = self.p.parentMethod1
     self.p.parentMethod1 = function () {
         // Override parent method
         // Do something else and continue with original parentMethod
-        _protectedMethod1.call(self);
+        _parentMethod1.call(self);
     };
     
     self.p.parentMethod2 = function() {
