@@ -1,29 +1,34 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
-const expect = require('chai').expect;
-const queryContract = require("../../utils/query-contract");
-const invokeContract = require("../../utils/invoke-contract");
 const deployOperation = require("../../scripts/deploy-operation");
+const {TEST_RESULT, TEST_CONDITION, TEST_RESP_TYPE} = require("../../utils/constant");
+const TEST_INVOKE = require("../../utils/invoke-contract");
+const TEST_QUERY = require("../../utils/query-contract");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 
-/*
- Specify the zetrix address and private key
- */
 const privateKey = process.env.PRIVATE_KEY;
 const sourceAddress = process.env.ZTX_ADDRESS;
 
-/*
- Specify the smart contract address
- */
-let contractAddress = "";
+const privateKey1 = "privBrr7fmQiMJXCtW7GXb4qoU393w12TBqm5WUvid2h5LgULpTRo5rX";
+const sourceAddress1 = "ZTX3M6pWnCXk4e6vrXu4SQQganjQJrrF8Xezx";
 
-/*
- Specify the Zetrix Node url
- */
-const sdk = new ZtxChainSDK({
-    host: process.env.NODE_URL,
-    secure: true
-});
+const contractHandler = {
+    sdk: new ZtxChainSDK({
+        host: process.env.NODE_URL,
+        secure: true
+    }),
+    contractAddress: "",
+};
+
+const txInitiator = {
+    privateKey: privateKey,
+    sourceAddress: sourceAddress,
+};
+
+const txInitiator1 = {
+    privateKey: privateKey1,
+    sourceAddress: sourceAddress1,
+};
 
 describe('Test contract ztp1155', function () {
     this.timeout(100000);
@@ -31,212 +36,183 @@ describe('Test contract ztp1155', function () {
     before(async function () {
         let contractName = 'specs/ztp1155/ztp1155-spec.js'
         let input = {};
-        contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
-        console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractAddress);
+        contractHandler.contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
+        console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractHandler.contractAddress);
     });
 
-    it('testing contract info function', async () => {
+    it('1.0 testing contract info function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Getting contract info");
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'contractInfo'
-        });
-
-        expect(resp.name).to.equal("MY 1155");
+        await TEST_QUERY("### 1.1 Getting contract info",
+            contractHandler, {
+                method: 'contractInfo'
+            }, TEST_CONDITION.EQUALS, "MY 1155", 'name');
     });
 
     [1, 2, 3].forEach(value => {
-        it('testing mint function', async () => {
+        it('2.0 testing mint function', async () => {
 
-            console.log('\x1b[36m%s\x1b[0m', "### Minting token " + value);
-            let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-                method: 'mint',
-                params: {
-                    to: sourceAddress,
-                    id: value.toString(),
-                    value: "1000000000000"
-                }
-            });
-
-            expect(resp).to.equal(0);
+            await TEST_INVOKE("### 2." + value + " Minting token " + value,
+                contractHandler, txInitiator, {
+                    method: 'mint',
+                    params: {
+                        to: sourceAddress,
+                        id: value.toString(),
+                        value: "1000000000000"
+                    }
+                }, TEST_RESULT.SUCCESS);
         })
     });
 
-    it('testing get balance of function', async () => {
+    it('3.0 testing get balance of function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Getting balance of " + sourceAddress);
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'balanceOf',
-            params: {
-                account: sourceAddress,
-                id: "1"
-            }
-        });
-
-        expect(resp).to.equal("1000000000000");
+        await TEST_QUERY("### 3.1 Getting balance of " + sourceAddress,
+            contractHandler, {
+                method: 'balanceOf',
+                params: {
+                    account: sourceAddress,
+                    id: "1"
+                }
+            }, TEST_CONDITION.EQUALS, "1000000000000");
     });
 
-    it('testing token uri function', async () => {
+    it('4.0 testing token uri function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Getting token uri");
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'uri',
-            params: {
-                id: "1"
-            }
-        });
-
-        expect(resp).to.equal("https://example.com/1");
+        await TEST_QUERY("### 4.1 Getting token uri",
+            contractHandler, {
+                method: 'uri',
+                params: {
+                    id: "1"
+                }
+            }, TEST_CONDITION.EQUALS, "https://example.com/1");
     });
 
-    it('testing get is approved for all function', async () => {
+    it('5.0 testing get is approved for all function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Getting is approved for all");
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'isApprovedForAll',
-            params: {
-                owner: sourceAddress,
-                operator: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi"
-            }
-        });
-
-        expect(resp).to.equal(false);
+        await TEST_QUERY("### 5.1 Getting is approved for all",
+            contractHandler, {
+                method: 'isApprovedForAll',
+                params: {
+                    owner: sourceAddress,
+                    operator: "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi"
+                }
+            }, TEST_CONDITION.EQUALS, false);
     });
 
-    it('testing safe transfer from function', async () => {
+    it('6.0 testing safe transfer from function', async () => {
 
         let recipient = "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi";
         let tokenId = "2";
         let value = "500000000000";
 
-        console.log('\x1b[36m%s\x1b[0m', "### Transferring token " + tokenId + " from " + sourceAddress + " to " + recipient + " with value " + value);
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'safeTransferFrom',
-            params: {
-                from: sourceAddress,
-                to: recipient,
-                id: tokenId,
-                value: value
-            }
-        });
+        await TEST_INVOKE("### 6.1 Transferring token " + tokenId + " from " + sourceAddress + " to " + recipient + " with value " + value,
+            contractHandler, txInitiator, {
+                method: 'safeTransferFrom',
+                params: {
+                    from: sourceAddress,
+                    to: recipient,
+                    id: tokenId,
+                    value: value
+                }
+            }, TEST_RESULT.SUCCESS);
 
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Getting owner of token " + tokenId);
-        resp = await queryContract(sdk, contractAddress, {
-            method: 'balanceOf',
-            params: {
-                account: recipient,
-                id: tokenId
-            }
-        });
-
-        expect(resp).to.equal(value);
+        await TEST_QUERY("### 6.2 Getting owner of token " + tokenId,
+            contractHandler, {
+                method: 'balanceOf',
+                params: {
+                    account: recipient,
+                    id: tokenId
+                }
+            }, TEST_CONDITION.EQUALS, value);
     });
 
-    it('testing set approval for all from function', async () => {
+    it('7.0 testing set approval for all from function', async () => {
 
         let operator = "ZTX3PU7vzzsaWEocrcau4jwjpMKjwK2tbnjWi";
 
-        console.log('\x1b[36m%s\x1b[0m', "### Setting approval for all from " + sourceAddress + " to " + operator);
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'setApprovalForAll',
-            params: {
-                operator: operator,
-                approved: true
-            }
-        });
+        await TEST_INVOKE("### 7.1 Setting approval for all from " + sourceAddress + " to " + operator,
+            contractHandler, txInitiator, {
+                method: 'setApprovalForAll',
+                params: {
+                    operator: operator,
+                    approved: true
+                }
+            }, TEST_RESULT.SUCCESS);
 
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Getting is approved for all");
-        resp = await queryContract(sdk, contractAddress, {
-            method: 'isApprovedForAll',
-            params: {
-                owner: sourceAddress,
-                operator: operator
-            }
-        });
-
-        expect(resp).to.equal(true);
+        await TEST_QUERY("### 7.2 Getting is approved for all",
+            contractHandler, {
+                method: 'isApprovedForAll',
+                params: {
+                    owner: sourceAddress,
+                    operator: operator
+                }
+            }, TEST_CONDITION.EQUALS, true);
     });
 
-    it('testing burn function', async () => {
+    it('8.0 testing burn function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Burning token");
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'burn',
-            params: {
-                from: sourceAddress,
-                id: "1",
-                value: "500000000000"
-            }
-        });
+        await TEST_INVOKE("### 8.1 Burning token",
+            contractHandler, txInitiator, {
+                method: 'burn',
+                params: {
+                    from: sourceAddress,
+                    id: "1",
+                    value: "500000000000"
+                }
+            }, TEST_RESULT.SUCCESS);
 
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Getting balance of " + sourceAddress);
-        resp = await queryContract(sdk, contractAddress, {
-            method: 'balanceOf',
-            params: {
-                account: sourceAddress,
-                id: "1"
-            }
-        });
-
-        expect(resp).to.equal("500000000000");
+        await TEST_QUERY("### 8.2 Getting balance of " + sourceAddress,
+            contractHandler, {
+                method: 'balanceOf',
+                params: {
+                    account: sourceAddress,
+                    id: "1"
+                }
+            }, TEST_CONDITION.EQUALS, "500000000000");
     });
 
-    it('testing mint batch function', async () => {
+    it('9.0 testing mint batch function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Minting batch token");
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'mintBatch',
-            params: {
-                to: sourceAddress,
-                ids: ["4", "5", "6"],
-                values: ["1000000000000", "1000000000000", "1000000000000"]
-            }
-        });
+        await TEST_INVOKE("### 9.1 Minting batch token",
+            contractHandler, txInitiator, {
+                method: 'mintBatch',
+                params: {
+                    to: sourceAddress,
+                    ids: ["4", "5", "6"],
+                    values: ["1000000000000", "1000000000000", "1000000000000"]
+                }
+            }, TEST_RESULT.SUCCESS);
 
-        expect(resp).to.equal(0);
+        await TEST_QUERY("### 9.2 Getting balance batch of " + sourceAddress,
+            contractHandler, {
+                method: 'balanceOfBatch',
+                params: {
+                    accounts: [sourceAddress, sourceAddress, sourceAddress],
+                    ids: ["4", "5", "6"]
+                }
+            }, TEST_CONDITION.EQUALS, ["1000000000000", "1000000000000", "1000000000000"], "", TEST_RESP_TYPE.ARRAY);
 
-        console.log('\x1b[36m%s\x1b[0m', "### Getting balance batch of " + sourceAddress);
-        resp = await queryContract(sdk, contractAddress, {
-            method: 'balanceOfBatch',
-            params: {
-                accounts: [sourceAddress, sourceAddress, sourceAddress],
-                ids: ["4", "5", "6"]
-            }
-        });
-
-        expect(resp).to.deep.equal(["1000000000000", "1000000000000", "1000000000000"]);
     })
 
-    it('testing burn batch function', async () => {
+    it('10.0 testing burn batch function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Minting batch token");
-        let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-            method: 'burnBatch',
-            params: {
-                from: sourceAddress,
-                ids: ["5", "6"],
-                values: ["700000000000", "400000000000"]
-            }
-        });
+        await TEST_INVOKE("### 10.1 Minting batch token",
+            contractHandler, txInitiator, {
+                method: 'burnBatch',
+                params: {
+                    from: sourceAddress,
+                    ids: ["5", "6"],
+                    values: ["700000000000", "400000000000"]
+                }
+            }, TEST_RESULT.SUCCESS);
 
-        expect(resp).to.equal(0);
-
-        console.log('\x1b[36m%s\x1b[0m', "### Getting balance batch of " + sourceAddress);
-        resp = await queryContract(sdk, contractAddress, {
-            method: 'balanceOfBatch',
-            params: {
-                accounts: [sourceAddress, sourceAddress, sourceAddress],
-                ids: ["4", "5", "6"]
-            }
-        });
-
-        expect(resp).to.deep.equal(["1000000000000", "300000000000", "600000000000"]);
+        await TEST_QUERY("### 10.2 Getting balance batch of " + sourceAddress,
+            contractHandler, {
+                method: 'balanceOfBatch',
+                params: {
+                    accounts: [sourceAddress, sourceAddress, sourceAddress],
+                    ids: ["4", "5", "6"]
+                }
+            }, TEST_CONDITION.EQUALS, ["1000000000000", "300000000000", "600000000000"], "", TEST_RESP_TYPE.ARRAY);
     })
 
 });

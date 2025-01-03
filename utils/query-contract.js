@@ -1,4 +1,13 @@
-async function queryContract(sdk, contractAddress, input) {
+const expect = require('chai').expect;
+const { TEST_CONDITION, TEST_RESP_TYPE} = require("./constant");
+
+async function TEST_QUERY(msg, contractHandler, input, expectCondition, expectResult, expectKey = "", expectType = TEST_RESP_TYPE.STRING) {
+
+    console.log('\x1b[36m%s\x1b[0m', msg);
+
+    const sdk = contractHandler.sdk;
+    const contractAddress = contractHandler.contractAddress;
+
     let resp = await sdk.contract.call({
         optType: 2,
         contractAddress: contractAddress,
@@ -10,7 +19,37 @@ async function queryContract(sdk, contractAddress, input) {
         return null;
     }
 
-    return JSON.parse(resp.result.query_rets[0].result.value);
+    let res = JSON.parse(resp.result.query_rets[0].result.value);
+
+    if (expectKey !== "") {
+        res = res[expectKey];
+    }
+
+    if (expectType === TEST_RESP_TYPE.NUMBER) {
+        res = parseInt(res);
+    }
+
+    if (expectCondition === TEST_CONDITION.EQUALS) {
+        if (expectType === TEST_RESP_TYPE.ARRAY) {
+            expect(res).to.deep.equal(expectResult);
+        } else {
+            expect(res).to.equal(expectResult);
+        }
+    } else if (expectCondition === TEST_CONDITION.CONTAINS) {
+        expect(res).to.contain(expectResult);
+    } else if (expectCondition === TEST_CONDITION.GREATER_THAN) {
+        expect(res).to.greaterThan(expectResult);
+    } else if (expectCondition === TEST_CONDITION.LESS_THAN) {
+        expect(res).to.lessThan(expectResult);
+    } else if (expectCondition === TEST_CONDITION.GREATER_THAN_OR_EQUAL) {
+        expect(res).to.greaterThanOrEqual(expectResult);
+    } else if (expectCondition === TEST_CONDITION.LESS_THAN_OR_EQUAL) {
+        expect(res).to.lessThanOrEqual(expectResult);
+    } else {
+        throw new Error("Unknown condition: " + expectCondition);
+    }
+
+    return res;
 }
 
-module.exports = queryContract;
+module.exports = TEST_QUERY;

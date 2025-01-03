@@ -1,31 +1,34 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
-const expect = require('chai').expect;
-const BigNumber = require('bignumber.js');
-const sleep = require("../../utils/delay");
-const queryContract = require("../../utils/query-contract");
-const invokeContract = require("../../utils/invoke-contract");
 const deployOperation = require("../../scripts/deploy-operation");
+const TEST_INVOKE = require("../../utils/invoke-contract");
+const TEST_QUERY = require("../../utils/query-contract");
+const {TEST_RESULT, TEST_CONDITION} = require("../../utils/constant");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 
-/*
- Specify the zetrix address and private key
- */
 const privateKey = process.env.PRIVATE_KEY;
 const sourceAddress = process.env.ZTX_ADDRESS;
 
-/*
- Specify the smart contract address
- */
-let contractAddress = "";
+const privateKey1 = "privBrr7fmQiMJXCtW7GXb4qoU393w12TBqm5WUvid2h5LgULpTRo5rX";
+const sourceAddress1 = "ZTX3M6pWnCXk4e6vrXu4SQQganjQJrrF8Xezx";
 
-/*
- Specify the Zetrix Node url
- */
-const sdk = new ZtxChainSDK({
-    host: process.env.NODE_URL,
-    secure: true
-});
+const contractHandler = {
+    sdk: new ZtxChainSDK({
+        host: process.env.NODE_URL,
+        secure: true
+    }),
+    contractAddress: "",
+};
+
+const txInitiator = {
+    privateKey: privateKey,
+    sourceAddress: sourceAddress,
+};
+
+const txInitiator1 = {
+    privateKey: privateKey1,
+    sourceAddress: sourceAddress1,
+};
 
 describe('Test contract ztp72 enumerable', function () {
     this.timeout(30000);
@@ -33,59 +36,52 @@ describe('Test contract ztp72 enumerable', function () {
     before(async function () {
         let contractName = 'specs/ztp721/ztp721-enumerable-spec.js'
         let input = {};
-        contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
-        console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractAddress);
+        contractHandler.contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
+        console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractHandler.contractAddress);
     });
 
     [1, 2, 3].forEach(value => {
-        it('testing mint function', async () => {
+        it('1.0 testing mint function', async () => {
 
-            console.log('\x1b[36m%s\x1b[0m', "### Minting token " + value);
-            let resp = await invokeContract(sdk, sourceAddress, privateKey, contractAddress, {
-                method: 'mint',
-                params: {
-                    to: sourceAddress
-                }
-            });
-
-            expect(resp).to.equal(0);
+            await TEST_INVOKE("### 1." + value + " Minting token " + value,
+                contractHandler, txInitiator, {
+                    method: 'mint',
+                    params: {
+                        to: sourceAddress
+                    }
+                }, TEST_RESULT.SUCCESS);
         })
     });
 
-    it('testing token of owner by index function', async () => {
+    it('2.0 testing token of owner by index function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Get token of owner by index");
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'tokenOfOwnerByIndex',
-            params: {
-                index: 2,
-                owner: sourceAddress
-            }
-        });
-
-        expect(parseInt(resp)).to.greaterThanOrEqual(1);
+        await TEST_QUERY("### 2.1 Get token of owner by index",
+            contractHandler, {
+                method: 'tokenOfOwnerByIndex',
+                params: {
+                    index: 2,
+                    owner: sourceAddress
+                }
+            }, TEST_CONDITION.GREATER_THAN_OR_EQUAL, 1, "", "NUMBER");
     });
 
-    it('testing total supply function', async () => {
+    it('3.0 testing total supply function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Get total supply");
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'totalSupply'
-        });
-
-        expect(parseInt(resp)).to.greaterThanOrEqual(3);
+        await TEST_QUERY("### 3.1 Get total supply",
+            contractHandler, {
+                method: 'totalSupply'
+            }, TEST_CONDITION.GREATER_THAN_OR_EQUAL, 3, "", "NUMBER");
     });
 
-    it('testing token by index function', async () => {
+    it('4.0 testing token by index function', async () => {
 
-        console.log('\x1b[36m%s\x1b[0m', "### Get token by index");
-        let resp = await queryContract(sdk, contractAddress, {
-            method: 'tokenByIndex',
-            params: {
-                index: 2
-            }
-        });
-        expect(parseInt(resp)).to.greaterThanOrEqual(1);
+        await TEST_QUERY("### 4.1 Get token by index",
+            contractHandler, {
+                method: 'tokenByIndex',
+                params: {
+                    index: 2
+                }
+            }, TEST_CONDITION.GREATER_THAN_OR_EQUAL, 1, "", "NUMBER");
     });
 
 });

@@ -1,8 +1,17 @@
 const BigNumber = require('bignumber.js');
 const expect = require('chai').expect;
 const sleep = require("../utils/delay");
+const {TEST_RESULT} = require("./constant");
 
-async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, input) {
+async function TEST_INVOKE(msg, contractHandler, txInitiator, input, expectResult = TEST_RESULT.SUCCESS) {
+
+    console.log('\x1b[36m%s\x1b[0m', msg);
+
+    const sdk = contractHandler.sdk;
+    const contractAddress = contractHandler.contractAddress;
+    const sourceAddress = txInitiator.sourceAddress;
+    const privateKey = txInitiator.privateKey;
+
     const nonceResult = await sdk.account.getNonce(sourceAddress);
 
     if (nonceResult.errorCode !== 0) {
@@ -86,7 +95,12 @@ async function invokeContract(sdk, sourceAddress, privateKey, contractAddress, i
         sleep(2000);
     }
 
-    return info.errorCode;
+    if (expectResult === TEST_RESULT.FAILED) {
+        expect(info.errorCode).to.equal(151);
+    } else {
+        expect(info.errorCode).to.equal(0);
+    }
+
 }
 
-module.exports = invokeContract;
+module.exports = TEST_INVOKE;
