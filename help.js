@@ -15,8 +15,8 @@ Upgrade Scripts:
   - npm run upgrade:ztp1155 <arg>    Upgrades ZTP1155 (arg: core, pausable, burnable, supply, uri)
 
 Test Scripts:
-  - npm test <arg>                   Run on-chain integration tests (arg: <TEST_FILE_PATH>)
-  - npm run test-coverage <arg>      Run off-chain unit testing with coverage (arg: <TEST_FILE_PATH>)
+  - npm test <arg>                   Run on-chain integration tests (arg: tests/integration/TEST_FILE.js)
+  - npm run test-coverage <arg>      Run off-chain unit testing with coverage (arg: tests/unit/TEST_FILE.js)
     
 Run 'npm run <script>' to execute a command.
 `);

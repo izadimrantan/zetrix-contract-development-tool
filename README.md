@@ -38,14 +38,14 @@ npm run deploy:<NAMING_REFER_TO_PACKAGE_JSON>
 npm run upgrade:<NAMING_REFER_TO_PACKAGE_JSON>
 ```
 
-### Run test
-```
-npm test tests/<TEST_CASE>.js
-```
-
 ### Run test with coverage
 ```
-npm run test-coverage tests/<TEST_CASE>.js
+npm run test-coverage tests/unit/<TEST_CASE>.js
+```
+
+### Run integration test
+```
+npm test tests/integration/<TEST_CASE>.js
 ```
 
 ### Development guides
