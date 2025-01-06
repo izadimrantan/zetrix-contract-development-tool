@@ -1,12 +1,12 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
-const deployOperation = require("../../scripts/deploy-operation");
+const deployOperation = require("../../../scripts/deploy-operation");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 const crypto = require('crypto');
-const signData = require("../../utils/sign-data");
-const TEST_INVOKE = require("../../utils/invoke-contract");
-const TEST_QUERY = require("../../utils/query-contract");
-const {TEST_RESULT, TEST_CONDITION, TEST_RESP_TYPE} = require("../../utils/constant");
+const signData = require("../../../utils/sign-data");
+const TEST_INVOKE = require("../../../utils/invoke-contract");
+const TEST_QUERY = require("../../../utils/query-contract");
+const {TEST_RESULT, TEST_CONDITION, TEST_RESP_TYPE} = require("../../../utils/constant");
 
 const privateKey = process.env.PRIVATE_KEY;
 const sourceAddress = process.env.ZTX_ADDRESS;

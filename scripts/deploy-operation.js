@@ -20,7 +20,7 @@ async function deployOperation(nodeUrl, sourceAddress, privateKey, contractName,
     let contractData = beautifyData(merge(baseDir, fs.readFileSync(baseDir + contractName, 'utf8')));
     let contractAddress = null;
 
-    fs.writeFile('merged-contract.js', contractData, (err) => {
+    fs.writeFile('generated/merged-contract.js', contractData, (err) => {
         // throws an error, you could also catch it here
         if (err) throw err;
     });

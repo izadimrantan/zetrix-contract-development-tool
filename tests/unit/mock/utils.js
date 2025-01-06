@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 /**
  * Zetrix Smart Contract built-in function started with prefix Utils.*
  *
@@ -15,6 +16,9 @@ const Utils = {
      * @readonly
      */
     int256Compare: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return x > y ? 1 : x < y ? -1 : 0;
     },
 
     /**
@@ -28,6 +32,9 @@ const Utils = {
      * @readonly
      */
     int256Add: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x + y).toString();
     },
 
     /**
@@ -41,6 +48,9 @@ const Utils = {
      * @readonly
      */
     int256Sub: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x - y).toString();
     },
 
     /**
@@ -54,6 +64,9 @@ const Utils = {
      * @readonly
      */
     int256Div: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x / y).toString();
     },
 
     /**
@@ -67,6 +80,9 @@ const Utils = {
      * @readonly
      */
     int256Mod: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x % y).toString();
     },
 
     /**
@@ -80,6 +96,9 @@ const Utils = {
      * @readonly
      */
     int256Mul: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x * y).toString();
     },
 
     /**
@@ -93,6 +112,9 @@ const Utils = {
      * @readonly
      */
     int64Compare: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return x > y ? 1 : x < y ? -1 : 0;
     },
 
     /**
@@ -106,6 +128,9 @@ const Utils = {
      * @readonly
      */
     int64Add: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x + y).toString();
     },
 
     /**
@@ -119,6 +144,9 @@ const Utils = {
      * @readonly
      */
     int64Sub: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x - y).toString();
     },
 
     /**
@@ -132,6 +160,9 @@ const Utils = {
      * @readonly
      */
     int64Div: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x / y).toString();
     },
 
     /**
@@ -145,6 +176,9 @@ const Utils = {
      * @readonly
      */
     int64Mod: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x % y).toString();
     },
 
     /**
@@ -158,6 +192,9 @@ const Utils = {
      * @readonly
      */
     int64Mul: (x, y) => {
+        x = parseInt(x);
+        y = parseInt(y);
+        return (x * y).toString();
     },
 
     /**
@@ -170,6 +207,7 @@ const Utils = {
      * @readonly
      */
     sha256: (data, dataType = 0) => {
+        return crypto.createHash('sha256').update(data).digest('hex');
     },
 
     /**
@@ -177,10 +215,11 @@ const Utils = {
      *
      * @param {string} address - Address to check
      * @returns {boolean} - Returns true on success, false on failure
-     * @example let ret = Utils.addressCheck('adxSio3m7C7D84GzgmtTXanUNMwPezys9azQB');
+     * @example let ret = Utils.addressCheck('ZTX3io3m7C7D84GzgmtTXanUNMwPezys9azQB');
      * @readonly
      */
     addressCheck: (address) => {
+        return true;
     },
 
     /**
@@ -195,6 +234,7 @@ const Utils = {
      * @readonly
      */
     ecVerify: (signedData, publicKey, blobData, blobDataType = 0) => {
+        return true;
     },
 
     /**
@@ -206,6 +246,7 @@ const Utils = {
      * @readonly
      */
     toAddress: (publicKey) => {
+        return 'ZTX3xxxxxyyzzz';
     },
 
     /**
@@ -228,6 +269,7 @@ const Utils = {
      * @readonly
      */
     stoI64Check: (strNumber) => {
+        return true;
     },
 
     /**
@@ -239,6 +281,7 @@ const Utils = {
      * @readonly
      */
     stoI256Check: (strNumber) => {
+        return true;
     },
 
     /**
@@ -252,6 +295,9 @@ const Utils = {
      * @readonly
      */
     assert: (condition, msg = '') => {
+        if (!condition) {
+            throw new Error(msg);
+        }
     },
 
     /**
@@ -263,6 +309,7 @@ const Utils = {
      * @readonly
      */
     toBaseUnit: (value) => {
+        return (value * 10 ** 6).toString();
     },
 
     /**
@@ -275,6 +322,7 @@ const Utils = {
      * @readonly
      */
     bpRangeProofVerify: (commit, proof) => {
+        return true;
     },
 
     /**
@@ -289,6 +337,7 @@ const Utils = {
      * @readonly
      */
     pedersenTallyVerify: (inputCommits, outputCommits, excessMsg, excessSign) => {
+        return true;
     },
 
     /**
@@ -300,5 +349,8 @@ const Utils = {
      * @readonly
      */
     hexToDec: (strHex) => {
+        return parseInt(strHex, 16).toString();
     }
 }
+
+module.exports = Utils;

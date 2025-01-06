@@ -5,3 +5,5 @@ node_modules
 merged-contract.js
 coverage
 .nyc_output
+generated/*.mjs
+generated/*.js

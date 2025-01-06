@@ -1,7 +1,7 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
-const deployOperation = require("../../scripts/deploy-operation");
-const TEST_INVOKE = require("../../utils/invoke-contract");
-const {TEST_RESULT} = require("../../utils/constant");
+const deployOperation = require("../../../scripts/deploy-operation");
+const TEST_INVOKE = require("../../../utils/invoke-contract");
+const {TEST_RESULT} = require("../../../utils/constant");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 
@@ -29,11 +29,11 @@ const txInitiator1 = {
     sourceAddress: sourceAddress1,
 };
 
-describe('Test contract ztp72 pausable', function () {
+describe('Test contract ztp20 pausable', function () {
     this.timeout(100000);
 
     before(async function () {
-        let contractName = 'specs/ztp721/ztp721-pausable-spec.js'
+        let contractName = 'specs/ztp20/ztp20-pausable-spec.js'
         let input = {};
         contractHandler.contractAddress = await deployOperation(process.env.NODE_URL, sourceAddress, privateKey, contractName, input);
         console.log('\x1b[36m%s\x1b[0m', "### Running test on contract address: ", contractHandler.contractAddress);
@@ -45,7 +45,8 @@ describe('Test contract ztp72 pausable', function () {
             contractHandler, txInitiator, {
                 method: 'mint',
                 params: {
-                    to: sourceAddress
+                    account: sourceAddress,
+                    value: "1000000000000"
                 }
             }, TEST_RESULT.SUCCESS);
     });
@@ -61,7 +62,8 @@ describe('Test contract ztp72 pausable', function () {
             contractHandler, txInitiator, {
                 method: 'mint',
                 params: {
-                    to: sourceAddress
+                    account: sourceAddress,
+                    value: "1000000000000"
                 }
             }, TEST_RESULT.FAILED);
     });
@@ -77,9 +79,9 @@ describe('Test contract ztp72 pausable', function () {
             contractHandler, txInitiator, {
                 method: 'mint',
                 params: {
-                    to: sourceAddress
+                    account: sourceAddress,
+                    value: "1000000000000"
                 }
             }, TEST_RESULT.SUCCESS);
     });
-
 });

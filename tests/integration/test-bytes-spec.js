@@ -1,6 +1,6 @@
 const ZtxChainSDK = require('zetrix-sdk-nodejs');
-const {TEST_RESULT, TEST_CONDITION, TEST_RESP_TYPE} = require("../utils/constant");
-const TEST_QUERY = require("../utils/query-contract");
+const {TEST_RESULT, TEST_CONDITION, TEST_RESP_TYPE} = require("../../utils/constant");
+const TEST_QUERY = require("../../utils/query-contract");
 require('dotenv').config({path: "/../.env"})
 require('mocha-generators').install();
 

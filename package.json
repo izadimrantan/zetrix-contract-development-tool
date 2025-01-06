@@ -2,6 +2,7 @@
   "scripts": {
     "help": "node help.js",
     "test": "node ./node_modules/mocha/bin/mocha -r dotenv/config",
+    "generate": "node ./tests/unit/generate-file.js",
     "test-coverage": "nyc --reporter=html --reporter=text node ./node_modules/mocha/bin/mocha -r dotenv/config",
     "deploy:math": "node ./scripts/deploy-math-spec.js",
     "deploy:bytes": "node ./scripts/deploy-bytes-spec.js",
@@ -20,9 +21,22 @@
     "zetrix-sdk-nodejs": "^1.0.1"
   },
   "devDependencies": {
-    "chai": "^4.3.6",
-    "mocha": "^10.0.0",
+    "chai": "^4.5.0",
+    "istanbul-lib-instrument": "^6.0.3",
+    "mocha": "^10.8.2",
     "mocha-generators": "^2.0.0",
-    "nyc": "^17.1.0"
+    "nyc": "^17.1.0",
+    "sinon": "^19.0.2"
+  },
+  "nyc": {
+    "include": [
+      "generated/**/*.js",
+      "generated/**/*.mjs"
+    ],
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "all": false
   }
 }
