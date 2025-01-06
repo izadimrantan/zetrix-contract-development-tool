@@ -43,6 +43,11 @@ npm run upgrade:<NAMING_REFER_TO_PACKAGE_JSON>
 npm test tests/<TEST_CASE>.js
 ```
 
+### Run test with coverage
+```
+npm run test-coverage tests/<TEST_CASE>.js
+```
+
 ### Development guides
 
 The development of Zetrix smart contract is using Javascript ES5 which has less support on the OOP such as `class`. Hence, we are imitating the OOP implementation by using functionalities available in the ES5.

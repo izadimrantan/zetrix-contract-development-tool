@@ -2,7 +2,6 @@
   "scripts": {
     "help": "node help.js",
     "test": "node ./node_modules/mocha/bin/mocha -r dotenv/config",
-    "generate": "node ./tests/unit/generate-file.js",
     "test-coverage": "nyc --reporter=html --reporter=text node ./node_modules/mocha/bin/mocha -r dotenv/config",
     "deploy:math": "node ./scripts/deploy-math-spec.js",
     "deploy:bytes": "node ./scripts/deploy-bytes-spec.js",
